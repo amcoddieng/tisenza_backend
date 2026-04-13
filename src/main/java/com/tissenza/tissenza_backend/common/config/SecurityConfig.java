@@ -27,6 +27,8 @@ public class SecurityConfig {
                     "/api/hello",
                     "/api/personnes/**",
                     "/api/comptes/**",
+                    "/api/boutiques/**",
+                    "/api/documents/**",
                     "/v3/api-docs",
                     "/v3/api-docs/**",
                     "/v3/api-docs.yaml",
