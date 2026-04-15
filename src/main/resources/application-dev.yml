@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/tissenza_dev
     username: postgres
-    password: Papa1997
+    password: toor
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

@@ -2,6 +2,8 @@ package com.tissenza.tissenza_backend.modules.user.service;
 
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
 import com.tissenza.tissenza_backend.modules.user.repository.CompteRepository;
+import com.tissenza.tissenza_backend.exception.BusinessException;
+import com.tissenza.tissenza_backend.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,16 @@ public class CompteService {
     private final CompteRepository compteRepository;
 
     public Compte createCompte(Compte compte) {
+        // Vérifier si l'email existe déjà
+        if (compteRepository.existsByEmail(compte.getEmail())) {
+            throw new BusinessException("Email déjà utilisé: " + compte.getEmail(), "EMAIL_ALREADY_EXISTS");
+        }
+        
+        // Vérifier si le téléphone existe déjà
+        if (compte.getTelephone() != null && compteRepository.existsByTelephone(compte.getTelephone())) {
+            throw new BusinessException("Téléphone déjà utilisé: " + compte.getTelephone(), "TELEPHONE_ALREADY_EXISTS");
+        }
+        
         return compteRepository.save(compte);
     }
 
@@ -32,6 +44,19 @@ public class CompteService {
     public Compte updateCompte(Long id, Compte compteDetails) {
         return compteRepository.findById(id)
                 .map(compte -> {
+                    // Vérifier si l'email est utilisé par un autre compte
+                    if (!compte.getEmail().equals(compteDetails.getEmail()) && 
+                        compteRepository.existsByEmail(compteDetails.getEmail())) {
+                        throw new BusinessException("Email déjà utilisé: " + compteDetails.getEmail(), "EMAIL_ALREADY_EXISTS");
+                    }
+                    
+                    // Vérifier si le téléphone est utilisé par un autre compte
+                    if (compteDetails.getTelephone() != null && 
+                        !compteDetails.getTelephone().equals(compte.getTelephone()) && 
+                        compteRepository.existsByTelephone(compteDetails.getTelephone())) {
+                        throw new BusinessException("Téléphone déjà utilisé: " + compteDetails.getTelephone(), "TELEPHONE_ALREADY_EXISTS");
+                    }
+                    
                     compte.setEmail(compteDetails.getEmail());
                     compte.setTelephone(compteDetails.getTelephone());
                     compte.setMotDePasse(compteDetails.getMotDePasse());
@@ -40,7 +65,7 @@ public class CompteService {
                     compte.setIsVerified(compteDetails.getIsVerified());
                     return compteRepository.save(compte);
                 })
-                .orElseThrow(() -> new RuntimeException("Compte not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Compte", id.toString()));
     }
 
     public void deleteCompte(Long id) {

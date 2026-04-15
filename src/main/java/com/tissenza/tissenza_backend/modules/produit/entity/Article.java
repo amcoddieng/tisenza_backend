@@ -40,4 +40,42 @@ public class Article {
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<HistoriqueStock> historiqueStock;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Lot> lots;
+
+    /**
+     * Calcule le stock total à partir de tous les lots actifs
+     */
+    public Integer getStockTotal() {
+        if (lots == null || lots.isEmpty()) {
+            return stockActuel;
+        }
+        return lots.stream()
+                .filter(lot -> lot.getStatut() == Lot.Statut.ACTIF)
+                .mapToInt(Lot::getQuantiteRestante)
+                .sum();
+    }
+
+    /**
+     * Vérifie si l'article a des lots proches de la péremption
+     */
+    public boolean aLotsProchesPeremption() {
+        if (lots == null || lots.isEmpty()) {
+            return false;
+        }
+        return lots.stream()
+                .anyMatch(Lot::estProchePeremption);
+    }
+
+    /**
+     * Vérifie si l'article a des lots périmés
+     */
+    public boolean aLotsPerimes() {
+        if (lots == null || lots.isEmpty()) {
+            return false;
+        }
+        return lots.stream()
+                .anyMatch(Lot::estPerime);
+    }
 }

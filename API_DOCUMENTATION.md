@@ -2,26 +2,31 @@
 
 ## Table des Matières
 - [Configuration](#configuration)
-- [User Management APIs](#user-management-apis)
-- [Boutique Management APIs](#boutique-management-apis)
-- [Category Management APIs](#category-management-apis)
-- [Product Management APIs](#product-management-apis)
-- [Article Management APIs](#article-management-apis)
-- [Stock History APIs](#stock-history-apis)
+- [Gestion des Utilisateurs](#gestion-des-utilisateurs)
+- [Gestion des Boutiques](#gestion-des-boutiques)
+- [Gestion des Catégories](#gestion-des-catégories)
+- [Gestion des Produits](#gestion-des-produits)
+- [Gestion des Articles](#gestion-des-articles)
+- [Gestion des Lots](#gestion-des-lots)
+- [Gestion des Stocks](#gestion-des-stocks)
+- [Gestion des Commandes](#gestion-des-commandes)
+- [Workflows Complets](#workflows-complets)
+- [Codes d'Erreur](#codes-derreur)
+- [Notes Techniques](#notes-techniques)
 
 ---
 
 ## Configuration
 
-**Base URL:** `http://localhost:8081`
-**Swagger UI:** `http://localhost:8081/swagger-ui.html`
+**Base URL:** `http://localhost:8080`
+**Swagger UI:** `http://localhost:8080/swagger-ui.html`
 **Content-Type:** `application/json`
 
 ---
 
-## User Management APIs
+## Gestion des Utilisateurs
 
-### Personne APIs
+### Personnes
 
 #### Créer une personne
 ```http
@@ -52,43 +57,14 @@ Content-Type: application/json
 }
 ```
 
-#### Lister toutes les personnes
+#### Lister et rechercher des personnes
 ```http
 GET /api/personnes
-```
-
-**Response (200 OK):**
-```json
-[
-  {
-    "id": 1,
-    "nom": "Doe",
-    "prenom": "John",
-    "email": "john.doe@example.com",
-    "telephone": "+221771234567",
-    "dateNaissance": "1990-05-15",
-    "adresse": "Dakar, Sénégal",
-    "createdAt": "2026-04-13T01:50:00"
-  }
-]
-```
-
-#### Rechercher par nom
-```http
 GET /api/personnes/search/nom?nom=Doe
-```
-
-#### Compter les personnes
-```http
 GET /api/personnes/count
 ```
 
-**Response (200 OK):**
-```json
-1
-```
-
-### Compte APIs
+### Comptes Utilisateurs
 
 #### Créer un compte
 ```http
@@ -103,6 +79,13 @@ Content-Type: application/json
   "role": "CLIENT"
 }
 ```
+
+**Contraintes d'unicité:**
+- `email` doit être unique
+- `telephone` doit être unique
+
+**Erreurs possibles:**
+- `400 Bad Request` - Email ou téléphone déjà utilisé
 
 **Response (201 Created):**
 ```json
@@ -119,22 +102,46 @@ Content-Type: application/json
 }
 ```
 
-#### Activer/Désactiver un compte
+#### Gérer un compte
 ```http
 PUT /api/comptes/1/activate
 PUT /api/comptes/1/deactivate
+PUT /api/comptes/1/verify
 ```
 
-#### Vérifier un compte
+### Documents
+
+#### Créer et valider un document
 ```http
-PUT /api/comptes/1/verify
+POST /api/documents
+Content-Type: application/json
+
+{
+  "personneId": 1,
+  "type": "CARTE_IDENTITE",
+  "url": "https://example.com/carte-id.pdf"
+}
+```
+
+**Types de documents:**
+- `CARTE_IDENTITE`
+- `NINEA`
+- `PASSPORT`
+- `RCCM`
+
+#### Gérer les documents
+```http
+PUT /api/documents/1/validate
+GET /api/documents/personne/1
+GET /api/documents/type/CARTE_IDENTITE
+GET /api/documents/validated/true
 ```
 
 ---
 
-## Boutique Management APIs
+## Gestion des Boutiques
 
-### Boutique APIs
+### Boutiques
 
 #### Créer une boutique
 ```http
@@ -164,9 +171,10 @@ Content-Type: application/json
 }
 ```
 
-#### Valider une boutique
+#### Gérer une boutique
 ```http
 PUT /api/boutiques/1/validate
+PUT /api/boutiques/1/note?note=4.5
 ```
 
 #### Rechercher des boutiques
@@ -176,60 +184,11 @@ GET /api/boutiques/statut/VALIDE
 GET /api/boutiques/vendeur/1
 ```
 
-#### Mettre à jour la note
-```http
-PUT /api/boutiques/1/note?note=4.5
-```
-
-### Document APIs
-
-#### Créer un document
-```http
-POST /api/documents
-Content-Type: application/json
-
-{
-  "personneId": 1,
-  "type": "CARTE_IDENTITE",
-  "url": "https://example.com/carte-id.pdf"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "id": 1,
-  "personneId": 1,
-  "type": "CARTE_IDENTITE",
-  "url": "https://example.com/carte-id.pdf",
-  "validated": false,
-  "createdAt": "2026-04-13T01:50:00"
-}
-```
-
-#### Types de documents disponibles
-- `CARTE_IDENTITE`
-- `NINEA`
-- `PASSPORT`
-- `RCCM`
-
-#### Valider un document
-```http
-PUT /api/documents/1/validate
-```
-
-#### Rechercher des documents
-```http
-GET /api/documents/personne/1
-GET /api/documents/type/CARTE_IDENTITE
-GET /api/documents/validated/true
-```
-
 ---
 
-## Category Management APIs
+## Gestion des Catégories
 
-### Catégorie APIs
+### Catégories
 
 #### Créer une catégorie
 ```http
@@ -243,29 +202,14 @@ Content-Type: application/json
 }
 ```
 
-**Response (201 Created):**
-```json
-{
-  "id": 1,
-  "nom": "Vêtements",
-  "description": "Catégorie de vêtements pour hommes et femmes",
-  "image": "https://example.com/vetements.jpg",
-  "createdAt": "2026-04-13T01:50:00"
-}
-```
-
-#### Lister les catégories avec sous-catégories
+#### Lister les catégories
 ```http
 GET /api/categories/with-sous-categories
-```
-
-#### Rechercher des catégories
-```http
 GET /api/categories/search?keyword=vêtements
 GET /api/categories/nom/Vêtements
 ```
 
-### Sous-Catégorie APIs
+### Sous-Catégories
 
 #### Créer une sous-catégorie
 ```http
@@ -279,18 +223,7 @@ Content-Type: application/json
 }
 ```
 
-**Response (201 Created):**
-```json
-{
-  "id": 1,
-  "categorieId": 1,
-  "nom": "Chemises",
-  "description": "Chemises pour hommes",
-  "createdAt": "2026-04-13T01:50:00"
-}
-```
-
-#### Lister les sous-catégories par catégorie
+#### Lister les sous-catégories
 ```http
 GET /api/sous-categories/categorie/1
 GET /api/sous-categories/categorie/1/with-produits
@@ -298,9 +231,9 @@ GET /api/sous-categories/categorie/1/with-produits
 
 ---
 
-## Product Management APIs
+## Gestion des Produits
 
-### Produit APIs
+### Produits
 
 #### Créer un produit
 ```http
@@ -317,44 +250,26 @@ Content-Type: application/json
 }
 ```
 
-**Response (201 Created):**
-```json
-{
-  "id": 1,
-  "boutiqueId": 1,
-  "sousCategorieId": 1,
-  "nom": "Chemise en coton",
-  "description": "Chemise confortable en coton bio",
-  "image": "https://example.com/chemise.jpg",
-  "statut": "ACTIF",
-  "createdAt": "2026-04-13T01:50:00"
-}
-```
-
-#### Lister les produits avec articles
+#### Gérer un produit
 ```http
-GET /api/produits/1/with-articles
+PUT /api/produits/1/activate
+PUT /api/produits/1/deactivate
 ```
 
 #### Rechercher des produits
 ```http
+GET /api/produits/1/with-articles
 GET /api/produits/boutique/1
 GET /api/produits/sous-categorie/1
 GET /api/produits/statut/ACTIF
 GET /api/produits/search?keyword=chemise
 ```
 
-#### Activer/Désactiver un produit
-```http
-PUT /api/produits/1/activate
-PUT /api/produits/1/deactivate
-```
-
 ---
 
-## Article Management APIs
+## Gestion des Articles
 
-### Article APIs
+### Articles
 
 #### Créer un article
 ```http
@@ -371,28 +286,10 @@ Content-Type: application/json
 }
 ```
 
-**Response (201 Created):**
-```json
-{
-  "id": 1,
-  "produitId": 1,
-  "sku": "CHM-COT-001",
-  "prix": 29.99,
-  "stockActuel": 50,
-  "attributs": "{\"couleur\":\"bleu\",\"taille\":\"M\",\"matiere\":\"coton\"}",
-  "image": "https://example.com/chemise-bleu.jpg"
-}
-```
-
-#### Gérer le stock
+#### Gérer le stock d'un article
 ```http
-# Mettre à jour le stock
 PUT /api/articles/1/stock?newStock=45
-
-# Ajouter du stock
 PUT /api/articles/1/stock/add?quantity=10&motif=Réapprovisionnement
-
-# Retirer du stock
 PUT /api/articles/1/stock/remove?quantity=5&motif=Vente
 ```
 
@@ -405,7 +302,7 @@ GET /api/articles/price-range?min=20&max=50
 GET /api/articles/search?keyword=bleu
 ```
 
-#### Articles par stock
+#### Articles par niveau de stock
 ```http
 GET /api/articles/stock/greater/10
 GET /api/articles/stock/less/5
@@ -421,9 +318,60 @@ GET /api/articles/stock/total/1
 
 ---
 
-## Stock History APIs
+## Gestion des Lots
 
-### Historique de Stock APIs
+### Lots
+
+#### Créer un lot
+```http
+POST /api/lots
+Content-Type: application/json
+
+{
+  "articleId": 1,
+  "numeroLot": "LOT-2024-001",
+  "quantiteInitiale": 100,
+  "dateFabrication": "2024-01-15",
+  "dateExpiration": "2025-01-15",
+  "prixAchat": 15.50,
+  "fournisseur": "Fournisseur A",
+  "emplacement": "Entrepôt A"
+}
+```
+
+#### Gérer un lot
+```http
+PUT /api/lots/1/stock/add?quantity=10&motif=Réapprovisionnement
+PUT /api/lots/1/stock/remove?quantity=5&motif=Vente
+DELETE /api/lots/1
+```
+
+#### Rechercher des lots
+```http
+GET /api/lots/article/1
+GET /api/lots/numero/LOT-2024-001
+GET /api/lots/statut/ACTIF
+GET /api/lots/fournisseur/Fournisseur%20A
+```
+
+#### Lots par péremption
+```http
+GET /api/lots/perimes
+GET /api/lots/proches-peremption
+GET /api/lots/peremption-before/2024-12-31
+```
+
+#### Statistiques sur les lots
+```http
+GET /api/lots/statistics
+GET /api/lots/count/statut/ACTIF
+```
+
+---
+
+## Gestion des Stocks
+
+### Historique des Stocks
 
 #### Créer un mouvement de stock
 ```http
@@ -438,19 +386,7 @@ Content-Type: application/json
 }
 ```
 
-**Response (201 Created):**
-```json
-{
-  "id": 1,
-  "articleId": 1,
-  "quantite": 10,
-  "type": "ENTREE",
-  "motif": "Nouvelle livraison",
-  "createdAt": "2026-04-13T01:50:00"
-}
-```
-
-#### Types de mouvements
+**Types de mouvements:**
 - `ENTREE` - Entrée de stock
 - `SORTIE` - Sortie de stock
 
@@ -468,14 +404,10 @@ GET /api/historique-stock/date-range?startDate=2026-04-01T00:00:00&endDate=2026-
 GET /api/historique-stock/article/1/date-range?startDate=2026-04-01T00:00:00&endDate=2026-04-30T23:59:59
 ```
 
-#### Derniers mouvements
+#### Derniers mouvements et statistiques
 ```http
 GET /api/historique-stock/latest
 GET /api/historique-stock/latest/article/1
-```
-
-#### Statistiques sur les mouvements
-```http
 GET /api/historique-stock/total/entree/1
 GET /api/historique-stock/total/sortie/1
 GET /api/historique-stock/stats/type
@@ -483,85 +415,305 @@ GET /api/historique-stock/stats/type
 
 ---
 
-## Exemples de Workflows Complets
+## Gestion des Commandes
 
-### 1. Créer une boutique complète avec produits
+### Commandes
+
+#### Créer une commande
+```http
+POST /api/commandes
+Content-Type: application/json
+
+{
+  "clientId": 1,
+  "lignesCommande": [
+    {
+      "articleId": 1,
+      "quantite": 2,
+      "prixUnitaire": 29.99,
+      "remise": 5.00,
+      "prixAchatUnitaire": 15.00
+    },
+    {
+      "articleId": 2,
+      "quantite": 1,
+      "prixUnitaire": 49.99
+    }
+  ],
+  "adresseLivraison": "123 Rue de la Paix, Dakar, Sénégal",
+  "notes": "Livraison après 18h",
+  "dateLivraisonSouhaitee": "2026-04-20T18:00:00"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "clientId": 1,
+  "clientEmail": "client@example.com",
+  "clientNom": "Doe John",
+  "numeroCommande": "CMD-20260415163030-ABC12345",
+  "montantTotal": 104.97,
+  "statut": "EN_ATTENTE",
+  "adresseLivraison": "123 Rue de la Paix, Dakar, Sénégal",
+  "notes": "Livraison après 18h",
+  "dateLivraisonSouhaitee": "2026-04-20T18:00:00",
+  "dateLivraisonReelle": null,
+  "createdAt": "2026-04-15T16:30:30",
+  "updatedAt": null,
+  "lignesCommande": [
+    {
+      "id": 1,
+      "articleId": 1,
+      "articleNom": "Chemise en coton",
+      "articleSku": "CHM-COT-001",
+      "quantite": 2,
+      "prixUnitaire": 29.99,
+      "remise": 5.00,
+      "montantTotal": 54.98,
+      "prixAchatUnitaire": 15.00,
+      "marge": 24.98,
+      "tauxMarge": 83.27
+    }
+  ]
+}
+```
+
+#### Rechercher des commandes
+```http
+GET /api/commandes/1
+GET /api/commandes/numero/CMD-20260415163030-ABC12345
+GET /api/commandes/client/1
+GET /api/commandes/statut/EN_ATTENTE
+GET /api/commandes/en-retard
+```
+
+#### Gérer le cycle de vie d'une commande
+```http
+# Valider une commande
+PUT /api/commandes/1/valider
+Content-Type: application/json
+{
+  "modifieParId": 2,
+  "motif": "Commande validée - Stock disponible"
+}
+
+# Mettre en préparation
+PUT /api/commandes/1/preparation
+Content-Type: application/json
+{
+  "modifieParId": 2,
+  "motif": "Début de la préparation"
+}
+
+# Marquer comme prête
+PUT /api/commandes/1/prete
+Content-Type: application/json
+{
+  "modifieParId": 2,
+  "motif": "Commande prête pour livraison"
+}
+
+# Mettre en livraison
+PUT /api/commandes/1/livraison
+Content-Type: application/json
+{
+  "modifieParId": 3,
+  "motif": "Remise au livreur"
+}
+
+# Livrer la commande
+PUT /api/commandes/1/livrer
+Content-Type: application/json
+{
+  "modifieParId": 3,
+  "motif": "Livraison effectuée avec succès"
+}
+
+# Annuler une commande
+PUT /api/commandes/1/annuler
+Content-Type: application/json
+{
+  "modifieParId": 2,
+  "motif": "Annulation demandée par le client"
+}
+```
+
+#### Statuts de commande
+- `EN_ATTENTE` - En attente de validation
+- `VALIDEE` - Validée par le vendeur
+- `EN_PREPARATION` - En cours de préparation
+- `PRETE` - Prête pour livraison
+- `EN_LIVRAISON` - En cours de livraison
+- `LIVREE` - Livrée avec succès
+- `ANNULEE` - Annulée
+
+#### Statistiques sur les commandes
+```http
+GET /api/commandes/statistiques
+```
+
+**Response:**
+```json
+{
+  "totalCommandes": 150,
+  "commandesEnAttente": 12,
+  "commandesValidees": 8,
+  "commandesEnPreparation": 5,
+  "commandesLivrees": 120,
+  "commandesAnnulees": 5,
+  "chiffreAffaires": 15420.75
+}
+```
+
+### Historique des Commandes
+
+#### Structure de l'historique
+Chaque changement de statut est automatiquement enregistré avec :
+- Ancien et nouveau statut
+- Utilisateur ayant effectué le changement
+- Motif du changement
+- Date et heure
+
+#### Consultation de l'historique
+L'historique peut être consulté via les endpoints dédiés ou directement dans les détails de la commande.
+
+---
+
+## Workflows Complets
+
+### 1. Créer une boutique complète
 
 ```bash
 # 1. Créer une personne
-curl -X POST http://localhost:8081/api/personnes \
+curl -X POST http://localhost:8080/api/personnes \
   -H "Content-Type: application/json" \
   -d '{"nom":"Seller","prenom":"John","email":"seller@example.com","telephone":"+221771234567","dateNaissance":"1985-05-15","adresse":"Dakar"}'
 
 # 2. Créer son compte vendeur
-curl -X POST http://localhost:8081/api/comptes \
+curl -X POST http://localhost:8080/api/comptes \
   -H "Content-Type: application/json" \
   -d '{"personneId":1,"email":"seller@example.com","motDePasse":"password123","telephone":"+221771234567","role":"VENDEUR"}'
 
 # 3. Créer une catégorie
-curl -X POST http://localhost:8081/api/categories \
+curl -X POST http://localhost:8080/api/categories \
   -H "Content-Type: application/json" \
   -d '{"nom":"Électronique","description":"Appareils électroniques"}'
 
-# 4. Créer une sous-catégorie
-curl -X POST http://localhost:8081/api/sous-categories \
-  -H "Content-Type: application/json" \
-  -d '{"categorieId":1,"nom":"Smartphones","description":"Téléphones mobiles"}'
-
-# 5. Créer la boutique
-curl -X POST http://localhost:8081/api/boutiques \
+# 4. Créer la boutique
+curl -X POST http://localhost:8080/api/boutiques \
   -H "Content-Type: application/json" \
   -d '{"vendeurId":1,"nom":"Tech Store","description":"Boutique de tech","addresse":"Dakar"}'
 
-# 6. Valider la boutique
-curl -X PUT http://localhost:8081/api/boutiques/1/validate
-
-# 7. Créer un produit
-curl -X POST http://localhost:8081/api/produits \
-  -H "Content-Type: application/json" \
-  -d '{"boutiqueId":1,"sousCategorieId":1,"nom":"iPhone 15","description":"Dernier iPhone","statut":"ACTIF"}'
-
-# 8. Créer un article
-curl -X POST http://localhost:8081/api/articles \
-  -H "Content-Type: application/json" \
-  -d '{"produitId":1,"sku":"IP15-128-BLK","prix":999.99,"stockActuel":25,"attributs":"{\"couleur\":\"noir\",\"capacite\":\"128GB\"}"}'
+# 5. Valider la boutique
+curl -X PUT http://localhost:8080/api/boutiques/1/validate
 ```
 
 ### 2. Gérer le stock d'un article
 
 ```bash
 # Ajouter du stock
-curl -X PUT "http://localhost:8081/api/articles/1/stock/add?quantity=10&motif=Réapprovisionnement"
+curl -X PUT "http://localhost:8080/api/articles/1/stock/add?quantity=10&motif=Réapprovisionnement"
 
 # Retirer du stock (vente)
-curl -X PUT "http://localhost:8081/api/articles/1/stock/remove?quantity=2&motif=Vente client"
+curl -X PUT "http://localhost:8080/api/articles/1/stock/remove?quantity=2&motif=Vente client"
 
 # Vérifier l'historique
-curl -X GET "http://localhost:8081/api/historique-stock/article/1"
+curl -X GET "http://localhost:8080/api/historique-stock/article/1"
+```
 
-# Vérifier le stock actuel
-curl -X GET "http://localhost:8081/api/articles/1"
+### 3. Gérer le cycle de vie complet d'une commande
+
+```bash
+# 1. Créer une commande
+curl -X POST http://localhost:8080/api/commandes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "clientId": 1,
+    "lignesCommande": [
+      {
+        "articleId": 1,
+        "quantite": 2,
+        "prixUnitaire": 29.99,
+        "prixAchatUnitaire": 15.00
+      }
+    ],
+    "adresseLivraison": "123 Rue de la Paix, Dakar",
+    "notes": "Livraison après 18h",
+    "dateLivraisonSouhaitee": "2026-04-20T18:00:00"
+  }'
+
+# 2. Valider la commande (vendeur)
+curl -X PUT http://localhost:8080/api/commandes/1/valider \
+  -H "Content-Type: application/json" \
+  -d '{"modifieParId": 2, "motif": "Stock disponible, commande validée"}'
+
+# 3. Mettre en préparation
+curl -X PUT http://localhost:8080/api/commandes/1/preparation \
+  -H "Content-Type: application/json" \
+  -d '{"modifieParId": 2, "motif": "Début préparation commande"}'
+
+# 4. Marquer comme prête pour livraison
+curl -X PUT http://localhost:8080/api/commandes/1/prete \
+  -H "Content-Type: application/json" \
+  -d '{"modifieParId": 2, "motif": "Commande prête"}'
+
+# 5. Mettre en livraison
+curl -X PUT http://localhost:8080/api/commandes/1/livraison \
+  -H "Content-Type: application/json" \
+  -d '{"modifieParId": 3, "motif": "Remise au livreur"}'
+
+# 6. Livrer la commande
+curl -X PUT http://localhost:8080/api/commandes/1/livrer \
+  -H "Content-Type: application/json" \
+  -d '{"modifieParId": 3, "motif": "Livraison réussie"}'
+
+# 7. Consulter les statistiques
+curl -X GET "http://localhost:8080/api/commandes/statistiques"
 ```
 
 ---
 
-## Codes d'Erreur Communs
+## Codes d'Erreur
 
-- **400 Bad Request** - Données invalides ou manquantes
-- **404 Not Found** - Ressource non trouvée
-- **409 Conflict** - Conflit de données (ex: SKU déjà existant)
-- **500 Internal Server Error** - Erreur serveur
+| Code | Description | Exemples |
+|------|-------------|----------|
+| **400** | Bad Request | Données invalides, champs manquants |
+| **404** | Not Found | Ressource non trouvée (ID inexistant) |
+| **409** | Conflict | Conflit de données (email, SKU déjà utilisés) |
+| **500** | Internal Server Error | Erreur serveur, base de données |
 
----
-
-## Notes importantes
-
-1. **Authentication**: Actuellement tous les endpoints sont publics (`permitAll()`)
-2. **Database**: PostgreSQL configuré pour le développement
-3. **Enums**: Utilisent `VARCHAR` pour compatibilité PostgreSQL
-4. **JSON**: Les attributs des articles sont stockés en JSON
-5. **Timestamps**: Gérés automatiquement avec `@CreationTimestamp`
+**Messages d'erreur courants:**
+- `"Article non trouvé avec l'ID: X"`
+- `"Email déjà utilisé: xxx"`
+- `"Numéro de lot déjà utilisé: xxx"`
 
 ---
 
-*Dernière mise à jour: 13 Avril 2026*
+## Notes Techniques
+
+### Configuration
+- **Base de données**: PostgreSQL
+- **Port**: 8080
+- **Content-Type**: `application/json`
+
+### Sécurité
+- **Authentication**: Endpoints publics (`permitAll()`)
+- **Passwords**: Hashés avec BCrypt
+- **JWT**: Configuré mais non activé
+
+### Base de données
+- **Enums**: Utilisent `VARCHAR` pour PostgreSQL
+- **JSON**: Attributs des articles stockés en JSON
+- **Timestamps**: Gérés automatiquement
+
+### Contraintes d'unicité
+- `Compte.email` unique
+- `Compte.telephone` unique  
+- `Article.sku` unique
+- `Lot.numeroLot` unique
+
+---
+
+*Documentation mise à jour le 15 Avril 2026*

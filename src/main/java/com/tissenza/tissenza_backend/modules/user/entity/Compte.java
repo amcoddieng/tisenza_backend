@@ -26,7 +26,7 @@ public class Compte {
     @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(name = "telephone", length = 20)
+    @Column(name = "telephone", unique = true, length = 20)
     private String telephone;
 
     @Column(name = "mot_de_passe", nullable = false, columnDefinition = "TEXT")
