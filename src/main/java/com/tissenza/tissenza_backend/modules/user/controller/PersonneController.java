@@ -1,0 +1,115 @@
+package com.tissenza.tissenza_backend.modules.user.controller;
+
+import com.tissenza.tissenza_backend.modules.user.entity.Personne;
+import com.tissenza.tissenza_backend.modules.user.service.PersonneService;
+import com.tissenza.tissenza_backend.exception.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/personnes")
+@RequiredArgsConstructor
+@Tag(name = "Personne Management", description = "API pour la gestion des personnes")
+public class PersonneController {
+
+    private final PersonneService personneService;
+
+    @PostMapping
+    @Operation(summary = "Créer une nouvelle personne", description = "Crée une nouvelle personne dans le système")
+    public ResponseEntity<ApiResponse<Personne>> createPersonne(@RequestBody Personne personne) {
+        Personne createdPersonne = personneService.createPersonne(personne);
+        return new ResponseEntity<>(ApiResponse.success(createdPersonne, "Personne créée avec succès"), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Récupérer une personne par ID", description = "Retourne les détails d'une personne spécifique")
+    public ResponseEntity<ApiResponse<Personne>> getPersonneById(
+            @Parameter(description = "ID de la personne à récupérer") @PathVariable Long id) {
+        return personneService.getPersonneById(id)
+                .map(personne -> ResponseEntity.ok(ApiResponse.success(personne, "Personne trouvée")))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Personne non trouvée")));
+    }
+
+    @GetMapping
+    @Operation(summary = "Récupérer toutes les personnes", description = "Retourne la liste de toutes les personnes")
+    public ResponseEntity<ApiResponse<List<Personne>>> getAllPersonnes() {
+        List<Personne> personnes = personneService.getAllPersonnes();
+        return ResponseEntity.ok(ApiResponse.success(personnes, "Liste des personnes récupérée"));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Mettre à jour une personne", description = "Met à jour les informations d'une personne existante")
+    public ResponseEntity<ApiResponse<Personne>> updatePersonne(
+            @Parameter(description = "ID de la personne à mettre à jour") @PathVariable Long id,
+            @RequestBody Personne personneDetails) {
+        try {
+            Personne updatedPersonne = personneService.updatePersonne(id, personneDetails);
+            return ResponseEntity.ok(ApiResponse.success(updatedPersonne, "Personne mise à jour avec succès"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Personne non trouvée"));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Supprimer une personne", description = "Supprime une personne du système")
+    public ResponseEntity<ApiResponse<Void>> deletePersonne(
+            @Parameter(description = "ID de la personne à supprimer") @PathVariable Long id) {
+        personneService.deletePersonne(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "Personne supprimée avec succès"));
+    }
+
+    @GetMapping("/search/nom")
+    @Operation(summary = "Rechercher par nom", description = "Recherche des personnes par nom (insensible à la casse)")
+    public ResponseEntity<ApiResponse<List<Personne>>> searchByNom(
+            @Parameter(description = "Nom à rechercher") @RequestParam String nom) {
+        List<Personne> personnes = personneService.searchByNom(nom);
+        return ResponseEntity.ok(ApiResponse.success(personnes, "Résultats de recherche pour: " + nom));
+    }
+
+    @GetMapping("/search/prenom")
+    @Operation(summary = "Rechercher par prénom", description = "Recherche des personnes par prénom (insensible à la casse)")
+    public ResponseEntity<ApiResponse<List<Personne>>> searchByPrenom(
+            @Parameter(description = "Prénom à rechercher") @RequestParam String prenom) {
+        List<Personne> personnes = personneService.searchByPrenom(prenom);
+        return ResponseEntity.ok(ApiResponse.success(personnes, "Résultats de recherche pour: " + prenom));
+    }
+
+    @GetMapping("/search/ville")
+    @Operation(summary = "Rechercher par ville", description = "Recherche des personnes par ville")
+    public ResponseEntity<ApiResponse<List<Personne>>> searchByVille(
+            @Parameter(description = "Ville à rechercher") @RequestParam String ville) {
+        List<Personne> personnes = personneService.searchByVille(ville);
+        return ResponseEntity.ok(ApiResponse.success(personnes, "Personnes trouvées à: " + ville));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Recherche par mot-clé", description = "Recherche des personnes par mot-clé dans nom, prénom ou ville")
+    public ResponseEntity<ApiResponse<List<Personne>>> searchByKeyword(
+            @Parameter(description = "Mot-clé de recherche") @RequestParam String keyword) {
+        List<Personne> personnes = personneService.searchByKeyword(keyword);
+        return ResponseEntity.ok(ApiResponse.success(personnes, "Résultats de recherche pour: " + keyword));
+    }
+
+    @GetMapping("/count/ville")
+    @Operation(summary = "Compter par ville", description = "Compte le nombre de personnes par ville")
+    public ResponseEntity<Long> countByVille(
+            @Parameter(description = "Ville pour le comptage") @RequestParam String ville) {
+        long count = personneService.countByVille(ville);
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/exists/{id}")
+    @Operation(summary = "Vérifier l'existence", description = "Vérifie si une personne existe par ID")
+    public ResponseEntity<Boolean> existsById(
+            @Parameter(description = "ID de la personne à vérifier") @PathVariable Long id) {
+        boolean exists = personneService.existsById(id);
+        return ResponseEntity.ok(exists);
+    }
+}

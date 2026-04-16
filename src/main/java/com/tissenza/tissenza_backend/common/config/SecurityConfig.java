@@ -24,6 +24,16 @@ public class SecurityConfig {
             .authorizeHttpRequests(a -> a
                 .requestMatchers(
                     "/api/auth/**",
+                    "/api/hello",
+                    "/api/personnes/**",
+                    "/api/comptes/**",
+                    "/api/boutiques/**",
+                    "/api/documents/**",
+                    "/api/categories/**",
+                    "/api/sous-categories/**",
+                    "/api/produits/**",
+                    "/api/articles/**",
+                    "/api/historique-stock/**",
                     "/v3/api-docs",
                     "/v3/api-docs/**",
                     "/v3/api-docs.yaml",
