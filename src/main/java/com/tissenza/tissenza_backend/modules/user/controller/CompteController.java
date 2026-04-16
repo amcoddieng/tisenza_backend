@@ -1,7 +1,9 @@
 package com.tissenza.tissenza_backend.modules.user.controller;
 
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
+import com.tissenza.tissenza_backend.modules.user.dto.CompteDTO;
 import com.tissenza.tissenza_backend.modules.user.service.CompteService;
+import com.tissenza.tissenza_backend.exception.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,9 +24,9 @@ public class CompteController {
 
     @PostMapping
     @Operation(summary = "Créer un nouveau compte", description = "Crée un nouveau compte utilisateur")
-    public ResponseEntity<Compte> createCompte(@RequestBody Compte compte) {
-        Compte createdCompte = compteService.createCompte(compte);
-        return new ResponseEntity<>(createdCompte, HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<Compte>> createCompte(@RequestBody CompteDTO compteDTO) {
+        Compte createdCompte = compteService.createCompteFromDTO(compteDTO);
+        return new ResponseEntity<>(ApiResponse.success(createdCompte, "Compte créé avec succès"), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

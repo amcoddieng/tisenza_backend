@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDateTime;
 
@@ -44,5 +45,6 @@ public class Personne {
     private LocalDateTime updatedAt;
 
     @OneToOne(mappedBy = "personne", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Compte compte;
 }

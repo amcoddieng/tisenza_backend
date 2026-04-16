@@ -14,6 +14,7 @@ public class CompteDTO {
     private Long id;
     private Long personneId;
     private String email;
+    private String motDePasse;
     private String telephone;
     private Compte.Role role;
     private Compte.Statut statut;

@@ -96,13 +96,21 @@ POST /api/comptes
 Content-Type: application/json
 
 {
-  "personneId": 1,
+  "personneId": 1,  
   "email": "john.doe@example.com",
   "motDePasse": "password123",
   "telephone": "+221771234567",
   "role": "CLIENT"
 }
 ```
+
+**Contraintes d'unicité:**
+- `email` doit être unique
+- `telephone` doit être unique
+
+**Erreurs possibles:**
+- `400 Bad Request` - Email ou téléphone déjà utilisé
+- `Runtime Exception` - "Email déjà utilisé: xxx" ou "Téléphone déjà utilisé: xxx"
 
 **Response (201 Created):**
 ```json
@@ -561,6 +569,10 @@ curl -X GET "http://localhost:8081/api/articles/1"
 3. **Enums**: Utilisent `VARCHAR` pour compatibilité PostgreSQL
 4. **JSON**: Les attributs des articles sont stockés en JSON
 5. **Timestamps**: Gérés automatiquement avec `@CreationTimestamp`
+6. **Contraintes d'unicité**: 
+   - `Compte.email` doit être unique
+   - `Compte.telephone` doit être unique
+   - `Article.sku` doit être unique
 
 ---
 

@@ -1,7 +1,12 @@
 package com.tissenza.tissenza_backend.modules.user.service;
 
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
+import com.tissenza.tissenza_backend.modules.user.entity.Personne;
+import com.tissenza.tissenza_backend.modules.user.dto.CompteDTO;
 import com.tissenza.tissenza_backend.modules.user.repository.CompteRepository;
+import com.tissenza.tissenza_backend.modules.user.repository.PersonneRepository;
+import com.tissenza.tissenza_backend.exception.BusinessException;
+import com.tissenza.tissenza_backend.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +21,42 @@ import java.util.Optional;
 public class CompteService {
 
     private final CompteRepository compteRepository;
+    private final PersonneRepository personneRepository;
+
+    public Compte createCompteFromDTO(CompteDTO compteDTO) {
+        // Validate personne_id
+        if (compteDTO.getPersonneId() == null) {
+            throw new BusinessException("personne_id est obligatoire", "PERSONNE_ID_REQUIRED");
+        }
+        
+        // Fetch Personne entity
+        Personne personne = personneRepository.findById(compteDTO.getPersonneId())
+                .orElseThrow(() -> new ResourceNotFoundException("Personne", compteDTO.getPersonneId().toString()));
+        
+        // Create Compte entity from DTO
+        Compte compte = new Compte();
+        compte.setPersonne(personne);
+        compte.setEmail(compteDTO.getEmail());
+        compte.setTelephone(compteDTO.getTelephone());
+        compte.setMotDePasse(compteDTO.getMotDePasse());
+        compte.setRole(compteDTO.getRole());
+        compte.setStatut(compteDTO.getStatut() != null ? compteDTO.getStatut() : Compte.Statut.ACTIF);
+        compte.setIsVerified(compteDTO.getIsVerified() != null ? compteDTO.getIsVerified() : false);
+        
+        return createCompte(compte);
+    }
 
     public Compte createCompte(Compte compte) {
+        // Vérifier si l'email existe déjà
+        if (compteRepository.existsByEmail(compte.getEmail())) {
+            throw new BusinessException("Email déjà utilisé: " + compte.getEmail(), "EMAIL_ALREADY_EXISTS");
+        }
+        
+        // Vérifier si le téléphone existe déjà
+        if (compte.getTelephone() != null && compteRepository.existsByTelephone(compte.getTelephone())) {
+            throw new BusinessException("Téléphone déjà utilisé: " + compte.getTelephone(), "TELEPHONE_ALREADY_EXISTS");
+        }
+        
         return compteRepository.save(compte);
     }
 
@@ -32,6 +71,19 @@ public class CompteService {
     public Compte updateCompte(Long id, Compte compteDetails) {
         return compteRepository.findById(id)
                 .map(compte -> {
+                    // Vérifier si l'email est utilisé par un autre compte
+                    if (!compte.getEmail().equals(compteDetails.getEmail()) && 
+                        compteRepository.existsByEmail(compteDetails.getEmail())) {
+                        throw new BusinessException("Email déjà utilisé: " + compteDetails.getEmail(), "EMAIL_ALREADY_EXISTS");
+                    }
+                    
+                    // Vérifier si le téléphone est utilisé par un autre compte
+                    if (compteDetails.getTelephone() != null && 
+                        !compteDetails.getTelephone().equals(compte.getTelephone()) && 
+                        compteRepository.existsByTelephone(compteDetails.getTelephone())) {
+                        throw new BusinessException("Téléphone déjà utilisé: " + compteDetails.getTelephone(), "TELEPHONE_ALREADY_EXISTS");
+                    }
+                    
                     compte.setEmail(compteDetails.getEmail());
                     compte.setTelephone(compteDetails.getTelephone());
                     compte.setMotDePasse(compteDetails.getMotDePasse());
@@ -40,7 +92,7 @@ public class CompteService {
                     compte.setIsVerified(compteDetails.getIsVerified());
                     return compteRepository.save(compte);
                 })
-                .orElseThrow(() -> new RuntimeException("Compte not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Compte", id.toString()));
     }
 
     public void deleteCompte(Long id) {

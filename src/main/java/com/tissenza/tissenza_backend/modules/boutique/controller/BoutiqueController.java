@@ -2,6 +2,7 @@ package com.tissenza.tissenza_backend.modules.boutique.controller;
 
 import com.tissenza.tissenza_backend.modules.boutique.entity.Boutique;
 import com.tissenza.tissenza_backend.modules.boutique.service.BoutiqueService;
+import com.tissenza.tissenza_backend.exception.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,25 +23,25 @@ public class BoutiqueController {
 
     @PostMapping
     @Operation(summary = "Créer une nouvelle boutique", description = "Crée une nouvelle boutique dans le système")
-    public ResponseEntity<Boutique> createBoutique(@RequestBody Boutique boutique) {
+    public ResponseEntity<ApiResponse<Boutique>> createBoutique(@RequestBody Boutique boutique) {
         Boutique createdBoutique = boutiqueService.createBoutique(boutique);
-        return new ResponseEntity<>(createdBoutique, HttpStatus.CREATED);
+        return new ResponseEntity<>(ApiResponse.success(createdBoutique, "Boutique créée avec succès"), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Récupérer une boutique par ID", description = "Retourne les détails d'une boutique spécifique")
-    public ResponseEntity<Boutique> getBoutiqueById(
+    public ResponseEntity<ApiResponse<Boutique>> getBoutiqueById(
             @Parameter(description = "ID de la boutique à récupérer") @PathVariable Long id) {
         return boutiqueService.getBoutiqueById(id)
-                .map(boutique -> ResponseEntity.ok(boutique))
-                .orElse(ResponseEntity.notFound().build());
+                .map(boutique -> ResponseEntity.ok(ApiResponse.success(boutique, "Boutique trouvée")))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Boutique non trouvée")));
     }
 
     @GetMapping
     @Operation(summary = "Récupérer toutes les boutiques", description = "Retourne la liste de toutes les boutiques")
-    public ResponseEntity<List<Boutique>> getAllBoutiques() {
+    public ResponseEntity<ApiResponse<List<Boutique>>> getAllBoutiques() {
         List<Boutique> boutiques = boutiqueService.getAllBoutiques();
-        return ResponseEntity.ok(boutiques);
+        return ResponseEntity.ok(ApiResponse.success(boutiques, "Liste des boutiques récupérée"));
     }
 
     @PutMapping("/{id}")
