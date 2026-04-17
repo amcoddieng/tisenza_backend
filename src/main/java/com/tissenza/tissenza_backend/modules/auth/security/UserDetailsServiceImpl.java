@@ -61,7 +61,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .accountExpired(false)
                 .accountLocked(compte.getStatut() == Compte.Statut.SUSPENDU)
                 .credentialsExpired(false)
-                .disabled(compte.getStatut() == Compte.Statut.INACTIF || !compte.getIsVerified())
+                .disabled(compte.getStatut() == Compte.Statut.INACTIF)
                 .build();
     }
 }
