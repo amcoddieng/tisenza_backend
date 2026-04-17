@@ -11,6 +11,221 @@
 
 ---
 
+## Authentication APIs
+
+### Connexion Utilisateur
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Connexion réussie",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiJ9...",
+    "type": "Bearer",
+    "userId": 1,
+    "email": "john.doe@example.com",
+    "username": "Doe John",
+    "role": "CLIENT",
+    "expiresIn": 86400000
+  }
+}
+```
+
+**Erreurs possibles:**
+- `400 Bad Request` - Email ou mot de passe invalide
+- `401 Unauthorized` - Compte suspendu ou inactif
+
+**Codes d'erreur détaillés:**
+- `BAD_PASSWORD` - Mot de passe incorrect pour l'email spécifié
+- `EMAIL_NOT_FOUND` - Aucun compte trouvé avec l'email spécifié
+- `ACCOUNT_SUSPENDED` - Compte suspendu. Veuillez contacter l'administrateur
+- `ACCOUNT_INACTIVE` - Compte inactif. Veuillez activer votre compte
+- `ACCOUNT_DISABLED` - Compte désactivé. Veuillez contacter l'administrateur
+- `ACCOUNT_LOCKED` - Compte verrouillé. Veuillez contacter l'administrateur
+- `AUTH_ERROR` - Erreur technique lors de l'authentification
+- `EMAIL_ALREADY_EXISTS` - Email déjà utilisé lors de l'inscription
+- `INVALID_CREDENTIALS` - Identifiants invalides (générique)
+
+**Exemples de réponses d'erreur:**
+
+**Email non trouvé:**
+```json
+{
+  "success": false,
+  "message": "Aucun compte trouvé avec l'email: user@example.com",
+  "data": null,
+  "errorCode": "EMAIL_NOT_FOUND"
+}
+```
+
+**Mot de passe incorrect:**
+```json
+{
+  "success": false,
+  "message": "Mot de passe incorrect pour l'email: user@example.com",
+  "data": null,
+  "errorCode": "BAD_PASSWORD"
+}
+```
+
+---
+
+### Inscription Utilisateur
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "nom": "Doe",
+  "prenom": "John",
+  "email": "john.doe@example.com",
+  "password": "password123",
+  "telephone": "+221771234567",
+  "adresse": "Dakar, Sénégal",
+  "ville": "dakar",
+  "role": "CLIENT"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Compte créé avec succès",
+  "data": {
+    "userId": 1,
+    "email": "john.doe@example.com",
+    "username": "Doe John",
+    "role": "CLIENT",
+    "message": "Compte créé avec succès"
+  }
+}
+```
+
+**Validation:**
+- Nom obligatoire (2-100 caractères)
+- Prénom obligatoire (2-100 caractères)
+- Email unique et format valide
+- Mot de passe obligatoire (min 6 caractères)
+- Téléphone optionnel
+- Rôle par défaut: CLIENT
+
+---
+
+### Déconnexion
+```http
+POST /api/auth/logout
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Déconnexion réussie",
+  "data": null
+}
+```
+
+---
+
+### Informations Utilisateur Actuel
+```http
+GET /api/auth/me
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Informations utilisateur récupérées",
+  "data": {
+    "id": 2,
+    "nom": "Doe",
+    "prenom": "John",
+    "adresse": "Dakar, Sénégal",
+    "photoProfil": null,
+    "ville": "dakar",
+    "createdAt": "2026-04-16T22:11:53.802206",
+    "updatedAt": "2026-04-16T22:11:53.802206"
+  }
+}
+```
+
+**Headers requis:**
+- `Authorization: Bearer <token_jwt>` pour accéder
+
+---
+
+### Diagnostic d'Authentification
+
+#### Vérifier un Email
+```http
+GET /api/auth/diagnostic/check-email/{email}
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Diagnostic complété",
+  "data": {
+    "found": true,
+    "compteId": 1,
+    "email": "john.doe@example.com",
+    "statut": "ACTIF",
+    "role": "CLIENT",
+    "isVerified": false,
+    "hasPassword": true,
+    "passwordLength": 60,
+    "passwordHash": "$2a$10$N9qo8uLOickgx2ZMRZoMy...",
+    "hasPersonne": true,
+    "personneId": 1,
+    "personneName": "Doe John"
+  }
+}
+```
+
+#### Lister tous les Comptes
+```http
+GET /api/auth/diagnostic/list-accounts
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Liste des comptes",
+  "data": {
+    "totalAccounts": 2,
+    "accounts": [
+      {
+        "id": 1,
+        "email": "john.doe@example.com",
+        "statut": "ACTIF",
+        "role": "CLIENT",
+        "isVerified": false,
+        "hasPassword": true,
+        "hasPersonne": true
+      }
+    ]
+  }
+}
+```
+
+---
+
 ## Configuration
 
 **Base URL:** `http://localhost:8081`
