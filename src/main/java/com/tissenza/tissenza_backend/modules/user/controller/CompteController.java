@@ -2,6 +2,7 @@ package com.tissenza.tissenza_backend.modules.user.controller;
 
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
 import com.tissenza.tissenza_backend.modules.user.dto.CompteDTO;
+import com.tissenza.tissenza_backend.modules.user.dto.CompteWithPersonneDTO;
 import com.tissenza.tissenza_backend.modules.user.service.CompteService;
 import com.tissenza.tissenza_backend.exception.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -205,5 +206,39 @@ public class CompteController {
             @Parameter(description = "Téléphone à vérifier") @PathVariable String telephone) {
         boolean exists = compteService.existsByTelephone(telephone);
         return ResponseEntity.ok(exists);
+    }
+
+    // Endpoints DTO pour éviter LazyInitializationException
+    @GetMapping("/{id}/with-personne")
+    @Operation(summary = "Récupérer un compte avec sa personne", description = "Retourne un compte avec les informations de sa personne associée")
+    public ResponseEntity<ApiResponse<CompteWithPersonneDTO>> getCompteWithPersonne(
+            @Parameter(description = "ID du compte à récupérer") @PathVariable Long id) {
+        try {
+            CompteWithPersonneDTO compteDTO = compteService.getCompteWithPersonneById(id);
+            return ResponseEntity.ok(ApiResponse.success(compteDTO, "Compte récupéré avec succès"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Compte non trouvé"));
+        }
+    }
+
+    @GetMapping("/with-personne")
+    @Operation(summary = "Lister tous les comptes avec leurs personnes", description = "Retourne tous les comptes avec les informations de leurs personnes associées")
+    public ResponseEntity<ApiResponse<List<CompteWithPersonneDTO>>> getAllComptesWithPersonne() {
+        List<CompteWithPersonneDTO> comptes = compteService.getAllComptesWithPersonne();
+        return ResponseEntity.ok(ApiResponse.success(comptes, "Liste des comptes récupérée avec succès"));
+    }
+
+    @GetMapping("/email/{email}/with-personne")
+    @Operation(summary = "Récupérer un compte par email avec sa personne", description = "Retourne un compte par email avec les informations de sa personne associée")
+    public ResponseEntity<ApiResponse<CompteWithPersonneDTO>> getCompteByEmailWithPersonne(
+            @Parameter(description = "Email du compte à récupérer") @PathVariable String email) {
+        try {
+            CompteWithPersonneDTO compteDTO = compteService.getCompteWithPersonneByEmail(email);
+            return ResponseEntity.ok(ApiResponse.success(compteDTO, "Compte récupéré avec succès"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Compte non trouvé"));
+        }
     }
 }

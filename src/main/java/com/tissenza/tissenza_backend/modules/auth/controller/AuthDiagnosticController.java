@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -60,7 +61,7 @@ public class AuthDiagnosticController {
         
         // Lister tous les comptes pour diagnostic
         try {
-            var allComptes = compteService.getAllComptes();
+            List<Compte> allComptes = compteService.getAllComptes();
             result.put("totalAccounts", allComptes.size());
             
             var accountsInfo = allComptes.stream()

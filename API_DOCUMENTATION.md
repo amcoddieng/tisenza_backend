@@ -365,7 +365,9 @@ POST /api/boutiques
 Content-Type: application/json
 
 {
-  "vendeurId": 1,
+  "vendeur": {
+    "id": 1
+  },
   "nom": "Ma Boutique",
   "description": "Boutique de vêtements",
   "addresse": "Dakar, Plateau",
@@ -377,7 +379,9 @@ Content-Type: application/json
 ```json
 {
   "id": 1,
-  "vendeurId": 1,
+  "vendeur": {
+    "id": 1
+  },
   "nom": "Ma Boutique",
   "description": "Boutique de vêtements",
   "addresse": "Dakar, Plateau",
@@ -387,9 +391,34 @@ Content-Type: application/json
 }
 ```
 
-#### Valider une boutique
+#### Modifier une boutique
 ```http
-PUT /api/boutiques/1/validate
+PUT /api/boutiques/{id}
+Authorization: Bearer <token_jwt>
+Content-Type: application/json
+
+{
+  "vendeur": {
+    "id": 123
+  },
+  "nom": "Nouveau nom de boutique",
+  "description": "Nouvelle description",
+  "addresse": "Nouvelle adresse",
+  "logo": "https://example.com/nouveau-logo.png",
+  "statut": "VALIDE",
+  "note": 4.5
+}
+```
+
+#### Valider/Refuser une boutique
+```http
+PUT /api/boutiques/{id}/validate
+PUT /api/boutiques/{id}/refuse
+```
+
+#### Mettre à jour la note
+```http
+PUT /api/boutiques/{id}/note?note=4.5
 ```
 
 #### Rechercher des boutiques
@@ -399,12 +428,17 @@ GET /api/boutiques/statut/VALIDE
 GET /api/boutiques/vendeur/1
 ```
 
-#### Mettre à jour la note
-```http
-PUT /api/boutiques/1/note?note=4.5
-```
+---
+
+## Document Management APIs
 
 ### Document APIs
+
+#### Types de documents disponibles
+- `CARTE_IDENTITE`
+- `PASSPORT` 
+- `RCCM`
+- `PERMIS_SEJOUR`
 
 #### Créer un document
 ```http
@@ -461,8 +495,7 @@ Content-Type: application/json
 
 {
   "nom": "Vêtements",
-  "description": "Catégorie de vêtements pour hommes et femmes",
-  "image": "https://example.com/vetements.jpg"
+  "description": "Catégorie de vêtements pour hommes et femmes"
 }
 ```
 
@@ -472,7 +505,6 @@ Content-Type: application/json
   "id": 1,
   "nom": "Vêtements",
   "description": "Catégorie de vêtements pour hommes et femmes",
-  "image": "https://example.com/vetements.jpg",
   "createdAt": "2026-04-13T01:50:00"
 }
 ```
@@ -488,6 +520,17 @@ GET /api/categories/search?keyword=vêtements
 GET /api/categories/nom/Vêtements
 ```
 
+#### Modifier une catégorie
+```http
+PUT /api/categories/{id}
+Content-Type: application/json
+
+{
+  "nom": "Nouveau nom",
+  "description": "Nouvelle description"
+}
+```
+
 ### Sous-Catégorie APIs
 
 #### Créer une sous-catégorie
@@ -497,8 +540,26 @@ Content-Type: application/json
 
 {
   "categorieId": 1,
-  "nom": "Chemises",
-  "description": "Chemises pour hommes"
+  "nom": "T-shirts",
+  "description": "T-shirts pour hommes"
+}
+```
+
+#### Lister les sous-catégories
+```http
+GET /api/sous-categories
+GET /api/sous-categories/categorie/1
+```
+
+#### Modifier une sous-catégorie
+```http
+PUT /api/sous-categories/{id}
+Content-Type: application/json
+
+{
+  "categorieId": 1,
+  "nom": "Polo shirts",
+  "description": "Polos pour hommes"
 }
 ```
 
@@ -768,6 +829,276 @@ curl -X GET "http://localhost:8081/api/articles/1"
 
 ---
 
+## Product Management APIs
+
+### Produit APIs
+
+#### Créer un produit
+```http
+POST /api/produits
+Content-Type: application/json
+
+{
+  "nom": "iPhone 15 Pro",
+  "description": "Dernier modèle d'iPhone avec écran OLED",
+  "reference": "IP15-PRO-256",
+  "categorieId": 1,
+  "boutiqueId": 1,
+  "image": "https://example.com/iphone15pro.jpg"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "nom": "iPhone 15 Pro",
+  "description": "Dernier modèle d'iPhone avec écran OLED",
+  "reference": "IP15-PRO-256",
+  "categorieId": 1,
+  "boutiqueId": 1,
+  "image": "https://example.com/iphone15pro.jpg",
+  "createdAt": "2026-04-13T01:50:00"
+}
+```
+
+#### Lister les produits
+```http
+GET /api/produits
+GET /api/produits/{id}/with-articles
+```
+
+#### Rechercher des produits
+```http
+GET /api/produits/search?keyword=iPhone
+GET /api/produits/categorie/1
+GET /api/produits/boutique/1
+```
+
+### Article APIs
+
+#### Créer un article
+```http
+POST /api/articles
+Content-Type: application/json
+
+{
+  "produitId": 1,
+  "sku": "IP15-128-BLK",
+  "prix": 999.99,
+  "stockActuel": 25,
+  "attributs": "{\"couleur\":\"noir\",\"capacite\":\"128GB\"}"
+}
+```
+
+#### Modifier un article
+```http
+PUT /api/articles/{id}
+Content-Type: application/json
+
+{
+  "produitId": 1,
+  "sku": "IP15-128-BLK",
+  "prix": 899.99,
+  "stockActuel": 20,
+  "attributs": "{\"couleur\":\"noir\",\"capacite\":\"128GB\"}"
+}
+```
+
+#### Gérer le stock
+```http
+PUT /api/articles/{id}/stock/add?quantity=10&motif=Réapprovisionnement
+PUT /api/articles/{id}/stock/remove?quantity=2&motif=Vente
+```
+
+#### Historique du stock
+```http
+GET /api/historique-stock/article/{id}
+GET /api/historique-stock/produit/{id}
+```
+
+---
+
+## Module Paiement
+
+### Gestion des Moyens de Paiement
+
+#### Créer un moyen de paiement
+```http
+POST /api/paiement/moyens
+Content-Type: application/json
+
+{
+  "nom": "Wave",
+  "photo": "https://example.com/wave-logo.png"
+}
+```
+
+**Réponse:**
+```json
+{
+  "success": true,
+  "message": "Moyen de paiement créé avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Wave",
+    "photo": "https://example.com/wave-logo.png",
+    "createdAt": "2026-04-20T12:00:00"
+  }
+}
+```
+
+#### Lister tous les moyens de paiement
+```http
+GET /api/paiement/moyens
+```
+
+#### Récupérer un moyen de paiement par ID
+```http
+GET /api/paiement/moyens/{id}
+```
+
+#### Mettre à jour un moyen de paiement
+```http
+PUT /api/paiement/moyens/{id}
+Content-Type: application/json
+
+{
+  "nom": "Orange Money",
+  "photo": "https://example.com/orange-logo.png"
+}
+```
+
+#### Supprimer un moyen de paiement
+```http
+DELETE /api/paiement/moyens/{id}
+```
+
+#### Rechercher des moyens de paiement
+```http
+GET /api/paiement/moyens/search?keyword=wave
+```
+
+### Gestion des Associations Utilisateur-Moyen de Paiement
+
+#### Associer un moyen de paiement à un utilisateur
+```http
+POST /api/paiement/associations?userId=1&moyenPaiementId=2&actif=true
+```
+
+**Réponse:**
+```json
+{
+  "success": true,
+  "message": "Association créée avec succès",
+  "data": {
+    "id": 1,
+    "userId": 1,
+    "userEmail": "user@example.com",
+    "userNom": "John Doe",
+    "moyenPaiementId": 2,
+    "moyenPaiementNom": "Wave",
+    "moyenPaiementPhoto": "https://example.com/wave-logo.png",
+    "actif": true,
+    "createdAt": "2026-04-20T12:00:00"
+  }
+}
+```
+
+#### Lister les moyens de paiement d'un utilisateur
+```http
+GET /api/paiement/associations/user/{userId}
+```
+
+#### Lister les moyens de paiement actifs d'un utilisateur
+```http
+GET /api/paiement/associations/user/{userId}/actifs
+```
+
+#### Lister les utilisateurs ayant un moyen de paiement spécifique
+```http
+GET /api/paiement/associations/moyen/{moyenPaiementId}
+```
+
+#### Activer/Désactiver un moyen de paiement pour un utilisateur
+```http
+PUT /api/paiement/associations/{userId}/{moyenPaiementId}/activer
+PUT /api/paiement/associations/{userId}/{moyenPaiementId}/desactiver
+```
+
+#### Supprimer une association
+```http
+DELETE /api/paiement/associations/{userId}/{moyenPaiementId}
+```
+
+#### Vérifier si un utilisateur a un moyen de paiement actif
+```http
+GET /api/paiement/associations/{userId}/{moyenPaiementId}/check
+```
+
+**Réponse:**
+```json
+{
+  "success": true,
+  "message": "Vérification terminée",
+  "data": true
+}
+```
+
+#### Compter les moyens de paiement actifs d'un utilisateur
+```http
+GET /api/paiement/associations/user/{userId}/count
+```
+
+**Réponse:**
+```json
+{
+  "success": true,
+  "message": "Nombre de moyens de paiement actifs",
+  "data": 3
+}
+```
+
+### Structure des Données
+
+#### MoyenPaiement
+```json
+{
+  "id": 1,
+  "nom": "Wave",
+  "photo": "https://example.com/wave-logo.png",
+  "createdAt": "2026-04-20T12:00:00"
+}
+```
+
+#### UserMoyenPaiement
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "userEmail": "user@example.com",
+  "userNom": "John Doe",
+  "moyenPaiementId": 2,
+  "moyenPaiementNom": "Wave",
+  "moyenPaiementPhoto": "https://example.com/wave-logo.png",
+  "actif": true,
+  "createdAt": "2026-04-20T12:00:00"
+}
+```
+
+### Contraintes et Validation
+
+#### MoyenPaiement
+- `nom`: obligatoire, max 100 caractères, unique
+- `photo`: optionnel, max 255 caractères
+
+#### UserMoyenPaiement
+- `userId` et `moyenPaiementId`: obligatoires
+- `actif`: défaut `true`
+- Contrainte unique sur `(userId, moyenPaiementId)`
+
+---
+
 ## Codes d'Erreur Communs
 
 - **400 Bad Request** - Données invalides ou manquantes
@@ -791,4 +1122,4 @@ curl -X GET "http://localhost:8081/api/articles/1"
 
 ---
 
-*Dernière mise à jour: 13 Avril 2026*
+*Dernière mise à jour: 20 Avril 2026*

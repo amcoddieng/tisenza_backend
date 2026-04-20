@@ -8,6 +8,7 @@ import com.tissenza.tissenza_backend.modules.auth.security.JwtUtils;
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
 import com.tissenza.tissenza_backend.modules.user.entity.Personne;
 import com.tissenza.tissenza_backend.modules.user.dto.CompteDTO;
+import com.tissenza.tissenza_backend.modules.user.dto.CompteWithPersonneDTO;
 import com.tissenza.tissenza_backend.modules.user.service.CompteService;
 import com.tissenza.tissenza_backend.modules.user.service.PersonneService;
 import com.tissenza.tissenza_backend.exception.BusinessException;
@@ -155,6 +156,21 @@ public class AuthService {
 
     public void logout() {
         SecurityContextHolder.clearContext();
+    }
+
+    public CompteWithPersonneDTO getCurrentCompteWithPersonne() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String email = userDetails.getUsername();
+            try {
+                return compteService.getCompteWithPersonneByEmail(email);
+            } catch (Exception e) {
+                log.error("Erreur lors de la récupération du compte courant: {}", e.getMessage());
+                throw new BusinessException("Erreur lors de la récupération des informations utilisateur", "USER_INFO_ERROR");
+            }
+        }
+        throw new BusinessException("Utilisateur non authentifié", "USER_NOT_AUTHENTICATED");
     }
 
     public Compte getCurrentCompte() {

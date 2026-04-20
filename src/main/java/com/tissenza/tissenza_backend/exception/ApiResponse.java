@@ -31,4 +31,14 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> error(String message, String path) {
         return new ApiResponse<>(false, message, null, LocalDateTime.now(), path);
     }
+    
+    // Méthode pour définir les données (utilisée dans GlobalExceptionHandler)
+    public void setData(T data) {
+        this.data = data;
+    }
+    
+    // Méthode pour définir le chemin (utilisée dans GlobalExceptionHandler)
+    public void setPath(String path) {
+        this.path = path;
+    }
 }

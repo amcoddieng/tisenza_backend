@@ -6,6 +6,7 @@ import com.tissenza.tissenza_backend.modules.auth.dto.LoginResponse;
 import com.tissenza.tissenza_backend.modules.auth.dto.RegisterRequest;
 import com.tissenza.tissenza_backend.modules.auth.dto.RegisterResponse;
 import com.tissenza.tissenza_backend.modules.auth.service.AuthService;
+import com.tissenza.tissenza_backend.modules.user.dto.CompteWithPersonneDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,8 +49,8 @@ public class AuthController {
 
     @GetMapping("/me")
     @Operation(summary = "Informations utilisateur actuel", description = "Retourne les informations de l'utilisateur connecté")
-    public ResponseEntity<ApiResponse<Object>> getCurrentUser() {
-        Object currentPersonne = authService.getCurrentPersonne();
-        return ResponseEntity.ok(ApiResponse.success(currentPersonne, "Informations utilisateur récupérées"));
+    public ResponseEntity<ApiResponse<CompteWithPersonneDTO>> getCurrentUser() {
+        CompteWithPersonneDTO currentCompte = authService.getCurrentCompteWithPersonne();
+        return ResponseEntity.ok(ApiResponse.success(currentCompte, "Informations utilisateur récupérées"));
     }
 }

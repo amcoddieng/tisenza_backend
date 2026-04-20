@@ -3,6 +3,9 @@ package com.tissenza.tissenza_backend.modules.user.service;
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
 import com.tissenza.tissenza_backend.modules.user.entity.Personne;
 import com.tissenza.tissenza_backend.modules.user.dto.CompteDTO;
+import com.tissenza.tissenza_backend.modules.user.dto.CompteWithPersonneDTO;
+import com.tissenza.tissenza_backend.modules.user.dto.PersonneSimpleDTO;
+import com.tissenza.tissenza_backend.modules.user.dto.PersonneDTO;
 import com.tissenza.tissenza_backend.modules.user.repository.CompteRepository;
 import com.tissenza.tissenza_backend.modules.user.repository.PersonneRepository;
 import com.tissenza.tissenza_backend.exception.BusinessException;
@@ -157,7 +160,7 @@ public class CompteService {
                     compte.setLastLogin(LocalDateTime.now());
                     return compteRepository.save(compte);
                 })
-                .orElseThrow(() -> new RuntimeException("Compte not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Compte", id.toString()));
     }
 
     public Compte verifyCompte(Long id) {
@@ -176,5 +179,35 @@ public class CompteService {
                     return compteRepository.save(compte);
                 })
                 .orElseThrow(() -> new RuntimeException("Compte not found with id: " + id));
+    }
+
+    // Méthodes DTO pour éviter LazyInitializationException
+    @Transactional(readOnly = true)
+    public CompteWithPersonneDTO getCompteWithPersonneById(Long id) {
+        Compte compte = compteRepository.findByIdWithPersonne(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Compte", id.toString()));
+        
+        PersonneSimpleDTO personneDTO = PersonneSimpleDTO.fromEntity(compte.getPersonne());
+        return CompteWithPersonneDTO.fromEntities(compte, personneDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public CompteWithPersonneDTO getCompteWithPersonneByEmail(String email) {
+        Compte compte = compteRepository.findByEmailWithPersonne(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Compte", email));
+        
+        PersonneSimpleDTO personneDTO = PersonneSimpleDTO.fromEntity(compte.getPersonne());
+        return CompteWithPersonneDTO.fromEntities(compte, personneDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CompteWithPersonneDTO> getAllComptesWithPersonne() {
+        List<Compte> comptes = compteRepository.findAllWithPersonne();
+        return comptes.stream()
+                .map(compte -> {
+                    PersonneSimpleDTO personneDTO = PersonneSimpleDTO.fromEntity(compte.getPersonne());
+                    return CompteWithPersonneDTO.fromEntities(compte, personneDTO);
+                })
+                .toList();
     }
 }

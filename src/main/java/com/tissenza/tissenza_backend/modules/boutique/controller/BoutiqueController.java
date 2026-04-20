@@ -1,5 +1,6 @@
 package com.tissenza.tissenza_backend.modules.boutique.controller;
 
+import com.tissenza.tissenza_backend.modules.boutique.dto.BoutiqueDTO;
 import com.tissenza.tissenza_backend.modules.boutique.entity.Boutique;
 import com.tissenza.tissenza_backend.modules.boutique.service.BoutiqueService;
 import com.tissenza.tissenza_backend.exception.ApiResponse;
@@ -23,14 +24,14 @@ public class BoutiqueController {
 
     @PostMapping
     @Operation(summary = "Créer une nouvelle boutique", description = "Crée une nouvelle boutique dans le système")
-    public ResponseEntity<ApiResponse<Boutique>> createBoutique(@RequestBody Boutique boutique) {
-        Boutique createdBoutique = boutiqueService.createBoutique(boutique);
+    public ResponseEntity<ApiResponse<BoutiqueDTO>> createBoutique(@RequestBody BoutiqueDTO boutiqueDTO) {
+        BoutiqueDTO createdBoutique = boutiqueService.createBoutique(boutiqueDTO);
         return new ResponseEntity<>(ApiResponse.success(createdBoutique, "Boutique créée avec succès"), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Récupérer une boutique par ID", description = "Retourne les détails d'une boutique spécifique")
-    public ResponseEntity<ApiResponse<Boutique>> getBoutiqueById(
+    public ResponseEntity<ApiResponse<BoutiqueDTO>> getBoutiqueById(
             @Parameter(description = "ID de la boutique à récupérer") @PathVariable Long id) {
         return boutiqueService.getBoutiqueById(id)
                 .map(boutique -> ResponseEntity.ok(ApiResponse.success(boutique, "Boutique trouvée")))
@@ -39,21 +40,21 @@ public class BoutiqueController {
 
     @GetMapping
     @Operation(summary = "Récupérer toutes les boutiques", description = "Retourne la liste de toutes les boutiques")
-    public ResponseEntity<ApiResponse<List<Boutique>>> getAllBoutiques() {
-        List<Boutique> boutiques = boutiqueService.getAllBoutiques();
+    public ResponseEntity<ApiResponse<List<BoutiqueDTO>>> getAllBoutiques() {
+        List<BoutiqueDTO> boutiques = boutiqueService.getAllBoutiques();
         return ResponseEntity.ok(ApiResponse.success(boutiques, "Liste des boutiques récupérée"));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Mettre à jour une boutique", description = "Met à jour les informations d'une boutique existante")
-    public ResponseEntity<Boutique> updateBoutique(
+    public ResponseEntity<ApiResponse<BoutiqueDTO>> updateBoutique(
             @Parameter(description = "ID de la boutique à mettre à jour") @PathVariable Long id,
-            @RequestBody Boutique boutiqueDetails) {
+            @RequestBody BoutiqueDTO boutiqueDetails) {
         try {
-            Boutique updatedBoutique = boutiqueService.updateBoutique(id, boutiqueDetails);
-            return ResponseEntity.ok(updatedBoutique);
+            BoutiqueDTO updatedBoutique = boutiqueService.updateBoutique(id, boutiqueDetails);
+            return ResponseEntity.ok(ApiResponse.success(updatedBoutique, "Boutique mise à jour avec succès"));
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Boutique non trouvée"));
         }
     }
 

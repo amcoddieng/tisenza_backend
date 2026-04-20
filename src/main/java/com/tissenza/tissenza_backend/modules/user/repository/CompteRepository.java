@@ -39,4 +39,14 @@ public interface CompteRepository extends JpaRepository<Compte, Long> {
 
     @Query("SELECT COUNT(c) FROM Compte c WHERE c.isVerified = true")
     long countVerifiedUsers();
+
+    // JOIN FETCH queries pour éviter LazyInitializationException
+    @Query("SELECT c FROM Compte c LEFT JOIN FETCH c.personne WHERE c.id = :id")
+    Optional<Compte> findByIdWithPersonne(@Param("id") Long id);
+
+    @Query("SELECT c FROM Compte c LEFT JOIN FETCH c.personne WHERE c.email = :email")
+    Optional<Compte> findByEmailWithPersonne(@Param("email") String email);
+
+    @Query("SELECT c FROM Compte c LEFT JOIN FETCH c.personne")
+    List<Compte> findAllWithPersonne();
 }
