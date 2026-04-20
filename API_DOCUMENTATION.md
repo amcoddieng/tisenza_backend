@@ -921,6 +921,39 @@ GET /api/historique-stock/produit/{id}
 
 ## Module Paiement
 
+### Sécurité et Autorisations
+
+Le module paiement utilise Spring Security avec des autorisations basées sur les rôles :
+
+#### Rôles et Permissions
+- **ADMIN** : Accès complet à toutes les fonctionnalités
+- **VENDEUR** : Gestion de ses propres moyens de paiement
+- **CLIENT** : Visualisation et gestion de ses associations
+
+#### Endpoints Sécurisés
+
+**ADMIN uniquement :**
+- `POST /api/paiement/moyens` - Créer un moyen de paiement
+- `PUT /api/paiement/moyens/{id}` - Mettre à jour un moyen de paiement  
+- `DELETE /api/paiement/moyens/{id}` - Supprimer un moyen de paiement
+- `GET /api/paiement/associations/moyen/{moyenPaiementId}` - Lister les utilisateurs d'un moyen de paiement
+
+**Tous rôles authentifiés (ADMIN, VENDEUR, CLIENT) :**
+- `GET /api/paiement/moyens` - Lister tous les moyens de paiement
+- `GET /api/paiement/moyens/{id}` - Détails d'un moyen de paiement
+- `GET /api/paiement/moyens/search` - Rechercher des moyens de paiement
+- `POST /api/paiement/associations` - Associer un moyen de paiement
+- `GET /api/paiement/associations/user/{userId}` - Moyens de paiement d'un utilisateur
+- `GET /api/paiement/associations/user/{userId}/actifs` - Moyens actifs d'un utilisateur
+- `PUT /api/paiement/associations/{userId}/{moyenPaiementId}/activer` - Activer une association
+- `PUT /api/paiement/associations/{userId}/{moyenPaiementId}/desactiver` - Désactiver une association
+- `DELETE /api/paiement/associations/{userId}/{moyenPaiementId}` - Supprimer une association
+- `GET /api/paiement/associations/{userId}/{moyenPaiementId}/check` - Vérifier une association
+- `GET /api/paiement/associations/user/{userId}/count` - Compter les moyens actifs
+
+#### Authentification Requise
+Tous les endpoints nécessitent une authentification JWT valide sauf indication contraire.
+
 ### Gestion des Moyens de Paiement
 
 #### Créer un moyen de paiement
