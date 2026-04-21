@@ -1,31 +1,85 @@
 package com.tissenza.tissenza_backend.modules.produit.controller;
 
 import com.tissenza.tissenza_backend.modules.produit.entity.Article;
+import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
 import com.tissenza.tissenza_backend.modules.produit.service.ArticleService;
+import com.tissenza.tissenza_backend.service.CloudinaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/articles")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Article Management", description = "API pour la gestion des articles")
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final CloudinaryService cloudinaryService;
 
     @PostMapping
     @Operation(summary = "Créer un nouvel article", description = "Crée un nouvel article dans le système")
     public ResponseEntity<Article> createArticle(@RequestBody Article article) {
         Article createdArticle = articleService.createArticle(article);
         return new ResponseEntity<>(createdArticle, HttpStatus.CREATED);
+    }
+
+    /**
+     * Créer un article avec upload d'image
+     */
+    @PostMapping("/with-image")
+    @Operation(summary = "Créer un article avec image", description = "Crée un nouvel article avec upload d'image sur Cloudinary")
+    public ResponseEntity<Article> createArticleWithImage(
+            @RequestParam("produitId") Long produitId,
+            @RequestParam("sku") String sku,
+            @RequestParam("prix") BigDecimal prix,
+            @RequestParam(value = "stockActuel", required = false, defaultValue = "0") Integer stockActuel,
+            @RequestParam(value = "attributs", required = false) String attributs,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+        
+        try {
+            // Upload l'image si fournie
+            String imageUrl = null;
+            if (imageFile != null && !imageFile.isEmpty()) {
+                imageUrl = cloudinaryService.uploadImage(imageFile);
+                log.info("Image uploadée: {}", imageUrl);
+            }
+            
+            // Créer l'article avec l'URL de l'image
+            Article article = new Article();
+            
+            // Créer l'objet de relation avec le produit
+            Produit produit = new Produit();
+            produit.setId(produitId);
+            article.setProduit(produit);
+            
+            article.setSku(sku);
+            article.setPrix(prix);
+            article.setStockActuel(stockActuel);
+            article.setAttributs(attributs);
+            article.setImage(imageUrl);
+            
+            Article createdArticle = articleService.createArticle(article);
+            return new ResponseEntity<>(createdArticle, HttpStatus.CREATED);
+            
+        } catch (IOException e) {
+            log.error("Erreur lors de l'upload de l'image: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Erreur lors de la création de l'article: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/{id}")
@@ -54,6 +108,36 @@ public class ArticleController {
             return ResponseEntity.ok(updatedArticle);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * Mettre à jour l'image d'un article
+     */
+    @PostMapping("/{id}/image")
+    @Operation(summary = "Mettre à jour l'image", description = "Upload et met à jour l'image d'un article existant")
+    public ResponseEntity<Article> updateImage(
+            @Parameter(description = "ID de l'article") @PathVariable Long id,
+            @RequestParam("image") MultipartFile imageFile) {
+        
+        try {
+            // Upload l'image sur Cloudinary
+            String imageUrl = cloudinaryService.uploadImage(imageFile);
+            log.info("Image uploadée: {}", imageUrl);
+            
+            // Mettre à jour l'article avec la nouvelle URL
+            Article articleDetails = new Article();
+            articleDetails.setImage(imageUrl);
+            
+            Article updatedArticle = articleService.updateArticle(id, articleDetails);
+            return ResponseEntity.ok(updatedArticle);
+            
+        } catch (IOException e) {
+            log.error("Erreur lors de l'upload de l'image: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Erreur lors de la mise à jour de l'image: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

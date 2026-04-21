@@ -3,29 +3,67 @@ package com.tissenza.tissenza_backend.modules.user.controller;
 import com.tissenza.tissenza_backend.modules.user.entity.Personne;
 import com.tissenza.tissenza_backend.modules.user.service.PersonneService;
 import com.tissenza.tissenza_backend.exception.ApiResponse;
+import com.tissenza.tissenza_backend.service.CloudinaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/personnes")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Personne Management", description = "API pour la gestion des personnes")
 public class PersonneController {
 
     private final PersonneService personneService;
+    private final CloudinaryService cloudinaryService;
 
     @PostMapping
     @Operation(summary = "Créer une nouvelle personne", description = "Crée une nouvelle personne dans le système")
     public ResponseEntity<ApiResponse<Personne>> createPersonne(@RequestBody Personne personne) {
         Personne createdPersonne = personneService.createPersonne(personne);
         return new ResponseEntity<>(ApiResponse.success(createdPersonne, "Personne créée avec succès"), HttpStatus.CREATED);
+    }
+
+    /**
+     * Mettre à jour la photo de profil d'une personne
+     */
+    @PostMapping("/{id}/photo-profil")
+    @Operation(summary = "Mettre à jour la photo de profil", description = "Upload et met à jour la photo de profil d'une personne")
+    public ResponseEntity<ApiResponse<Personne>> updatePhotoProfil(
+            @Parameter(description = "ID de la personne") @PathVariable Long id,
+            @RequestParam("photoProfil") MultipartFile photoFile) {
+        
+        try {
+            // Upload la photo sur Cloudinary
+            String photoUrl = cloudinaryService.uploadImage(photoFile);
+            log.info("Photo de profil uploadée: {}", photoUrl);
+            
+            // Mettre à jour la personne avec la nouvelle URL
+            Personne personneDetails = new Personne();
+            personneDetails.setPhotoProfil(photoUrl);
+            
+            Personne updatedPersonne = personneService.updatePersonne(id, personneDetails);
+            return ResponseEntity.ok(ApiResponse.success(updatedPersonne, "Photo de profil mise à jour avec succès"));
+            
+        } catch (IOException e) {
+            log.error("Erreur lors de l'upload de la photo de profil: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Erreur lors de l'upload de la photo de profil"));
+        } catch (Exception e) {
+            log.error("Erreur lors de la mise à jour de la photo de profil: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Erreur lors de la mise à jour de la photo de profil"));
+        }
     }
 
     @GetMapping("/{id}")

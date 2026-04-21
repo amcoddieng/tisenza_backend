@@ -4,29 +4,81 @@ import com.tissenza.tissenza_backend.modules.boutique.dto.BoutiqueDTO;
 import com.tissenza.tissenza_backend.modules.boutique.entity.Boutique;
 import com.tissenza.tissenza_backend.modules.boutique.service.BoutiqueService;
 import com.tissenza.tissenza_backend.exception.ApiResponse;
+import com.tissenza.tissenza_backend.service.CloudinaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/boutiques")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Boutique Management", description = "API pour la gestion des boutiques")
 public class BoutiqueController {
 
     private final BoutiqueService boutiqueService;
+    private final CloudinaryService cloudinaryService;
 
     @PostMapping
     @Operation(summary = "Créer une nouvelle boutique", description = "Crée une nouvelle boutique dans le système")
     public ResponseEntity<ApiResponse<BoutiqueDTO>> createBoutique(@RequestBody BoutiqueDTO boutiqueDTO) {
         BoutiqueDTO createdBoutique = boutiqueService.createBoutique(boutiqueDTO);
         return new ResponseEntity<>(ApiResponse.success(createdBoutique, "Boutique créée avec succès"), HttpStatus.CREATED);
+    }
+
+    /**
+     * Créer une boutique avec upload de logo
+     */
+    @PostMapping("/with-logo")
+    @Operation(summary = "Créer une boutique avec logo", description = "Crée une nouvelle boutique avec upload de logo sur Cloudinary")
+    public ResponseEntity<ApiResponse<BoutiqueDTO>> createBoutiqueWithLogo(
+            @RequestParam("vendeurId") Long vendeurId,
+            @RequestParam("nom") String nom,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "addresse", required = false) String addresse,
+            @RequestParam(value = "statut", required = false, defaultValue = "EN_ATTENTE") String statut,
+            @RequestParam(value = "note", required = false) Float note,
+            @RequestParam(value = "logo", required = false) MultipartFile logoFile) {
+        
+        try {
+            // Upload le logo si fourni
+            String logoUrl = null;
+            if (logoFile != null && !logoFile.isEmpty()) {
+                logoUrl = cloudinaryService.uploadImage(logoFile);
+                log.info("Logo uploadé: {}", logoUrl);
+            }
+            
+            // Créer le DTO avec l'URL du logo
+            BoutiqueDTO boutiqueDTO = new BoutiqueDTO();
+            boutiqueDTO.setVendeurId(vendeurId);
+            boutiqueDTO.setNom(nom);
+            boutiqueDTO.setDescription(description);
+            boutiqueDTO.setAddresse(addresse);
+            boutiqueDTO.setStatut(Boutique.Statut.valueOf(statut));
+            boutiqueDTO.setNote(note);
+            boutiqueDTO.setLogo(logoUrl);
+            
+            BoutiqueDTO createdBoutique = boutiqueService.createBoutique(boutiqueDTO);
+            return new ResponseEntity<>(ApiResponse.success(createdBoutique, "Boutique créée avec succès"), HttpStatus.CREATED);
+            
+        } catch (IOException e) {
+            log.error("Erreur lors de l'upload du logo: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Erreur lors de l'upload du logo"));
+        } catch (Exception e) {
+            log.error("Erreur lors de la création de la boutique: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Erreur lors de la création de la boutique"));
+        }
     }
 
     @GetMapping("/{id}")
@@ -55,6 +107,38 @@ public class BoutiqueController {
             return ResponseEntity.ok(ApiResponse.success(updatedBoutique, "Boutique mise à jour avec succès"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Boutique non trouvée"));
+        }
+    }
+
+    /**
+     * Mettre à jour le logo d'une boutique
+     */
+    @PostMapping("/{id}/logo")
+    @Operation(summary = "Mettre à jour le logo", description = "Upload et met à jour le logo d'une boutique existante")
+    public ResponseEntity<ApiResponse<BoutiqueDTO>> updateLogo(
+            @Parameter(description = "ID de la boutique") @PathVariable Long id,
+            @RequestParam("logo") MultipartFile logoFile) {
+        
+        try {
+            // Upload le logo sur Cloudinary
+            String logoUrl = cloudinaryService.uploadImage(logoFile);
+            log.info("Logo uploadé: {}", logoUrl);
+            
+            // Mettre à jour la boutique avec la nouvelle URL
+            BoutiqueDTO boutiqueDetails = new BoutiqueDTO();
+            boutiqueDetails.setLogo(logoUrl);
+            
+            BoutiqueDTO updatedBoutique = boutiqueService.updateBoutique(id, boutiqueDetails);
+            return ResponseEntity.ok(ApiResponse.success(updatedBoutique, "Logo mis à jour avec succès"));
+            
+        } catch (IOException e) {
+            log.error("Erreur lors de l'upload du logo: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Erreur lors de l'upload du logo"));
+        } catch (Exception e) {
+            log.error("Erreur lors de la mise à jour du logo: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Erreur lors de la mise à jour du logo"));
         }
     }
 

@@ -1,30 +1,88 @@
 package com.tissenza.tissenza_backend.modules.produit.controller;
 
 import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
+import com.tissenza.tissenza_backend.modules.produit.entity.SousCategorie;
 import com.tissenza.tissenza_backend.modules.produit.service.ProduitService;
+import com.tissenza.tissenza_backend.modules.boutique.entity.Boutique;
+import com.tissenza.tissenza_backend.service.CloudinaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/produits")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Produit Management", description = "API pour la gestion des produits")
 public class ProduitController {
 
     private final ProduitService produitService;
+    private final CloudinaryService cloudinaryService;
 
     @PostMapping
     @Operation(summary = "Créer un nouveau produit", description = "Crée un nouveau produit dans le système")
     public ResponseEntity<Produit> createProduit(@RequestBody Produit produit) {
         Produit createdProduit = produitService.createProduit(produit);
         return new ResponseEntity<>(createdProduit, HttpStatus.CREATED);
+    }
+
+    /**
+     * Créer un produit avec upload d'image
+     */
+    @PostMapping("/with-image")
+    @Operation(summary = "Créer un produit avec image", description = "Crée un nouveau produit avec upload d'image sur Cloudinary")
+    public ResponseEntity<Produit> createProduitWithImage(
+            @RequestParam("boutiqueId") Long boutiqueId,
+            @RequestParam("sousCategorieId") Long sousCategorieId,
+            @RequestParam("nom") String nom,
+            @RequestParam("description") String description,
+            @RequestParam("statut") String statut,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+        
+        try {
+            // Upload l'image si fournie
+            String imageUrl = null;
+            if (imageFile != null && !imageFile.isEmpty()) {
+                imageUrl = cloudinaryService.uploadImage(imageFile);
+                log.info("Image uploadée: {}", imageUrl);
+            }
+            
+            // Créer le produit avec l'URL de l'image
+            Produit produit = new Produit();
+            
+            // Créer les objets de relation avec les IDs
+            Boutique boutique = new Boutique();
+            boutique.setId(boutiqueId);
+            produit.setBoutique(boutique);
+            
+            SousCategorie sousCategorie = new SousCategorie();
+            sousCategorie.setId(sousCategorieId);
+            produit.setSousCategorie(sousCategorie);
+            
+            produit.setNom(nom);
+            produit.setDescription(description);
+            produit.setStatut(Produit.Statut.valueOf(statut));
+            produit.setImage(imageUrl);
+            
+            Produit createdProduit = produitService.createProduit(produit);
+            return new ResponseEntity<>(createdProduit, HttpStatus.CREATED);
+            
+        } catch (IOException e) {
+            log.error("Erreur lors de l'upload de l'image: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Erreur lors de la création du produit: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/{id}")

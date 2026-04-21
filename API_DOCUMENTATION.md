@@ -253,6 +253,14 @@ Content-Type: application/json
 }
 ```
 
+#### Mettre à jour la photo de profil
+```http
+POST /api/personnes/{id}/photo-profil
+Content-Type: multipart/form-data
+
+photoProfil: [fichier image]
+```
+
 **Response (201 Created):**
 ```json
 {
@@ -410,6 +418,28 @@ Content-Type: application/json
 }
 ```
 
+#### Créer une boutique avec upload de logo
+```http
+POST /api/boutiques/with-logo
+Content-Type: multipart/form-data
+
+vendeurId: 123
+nom: "Nouveau nom de boutique"
+description: "Nouvelle description"
+addresse: "Nouvelle adresse"
+statut: "VALIDE"
+note: 4.5
+logo: [fichier image]
+```
+
+#### Mettre à jour le logo d'une boutique
+```http
+POST /api/boutiques/{id}/logo
+Content-Type: multipart/form-data
+
+logo: [fichier image]
+```
+
 #### Valider/Refuser une boutique
 ```http
 PUT /api/boutiques/{id}/validate
@@ -436,9 +466,9 @@ GET /api/boutiques/vendeur/1
 
 #### Types de documents disponibles
 - `CARTE_IDENTITE`
+- `NINEA`
 - `PASSPORT` 
 - `RCCM`
-- `PERMIS_SEJOUR`
 
 #### Créer un document
 ```http
@@ -450,6 +480,24 @@ Content-Type: application/json
   "type": "CARTE_IDENTITE",
   "url": "https://example.com/carte-id.pdf"
 }
+```
+
+#### Créer un document avec upload de fichier
+```http
+POST /api/documents/with-file
+Content-Type: multipart/form-data
+
+personneId: 1
+type: "CARTE_IDENTITE"
+file: [fichier document]
+```
+
+#### Mettre à jour le fichier d'un document
+```http
+POST /api/documents/{id}/file
+Content-Type: multipart/form-data
+
+file: [fichier document]
 ```
 
 **Response (201 Created):**
@@ -485,6 +533,22 @@ GET /api/documents/validated/true
 ---
 
 ## Category Management APIs
+
+### Sécurité et Autorisations
+
+Le module de gestion des catégories utilise Spring Security avec des autorisations basées sur les rôles :
+
+#### Rôles et Permissions
+- **ADMIN** : Accès complet à toutes les fonctionnalités des catégories et sous-catégories
+
+#### Endpoints Sécurisés
+
+**ADMIN uniquement :**
+- **Catégories** : Tous les endpoints `/api/categories/**`
+- **Sous-Catégories** : Tous les endpoints `/api/sous-categories/**`
+
+#### Authentification Requise
+Tous les endpoints de catégories et sous-catégories nécessitent une authentification JWT valide avec le rôle ADMIN.
 
 ### Catégorie APIs
 
@@ -601,6 +665,19 @@ Content-Type: application/json
 }
 ```
 
+#### Créer un produit avec upload d'image
+```http
+POST /api/produits/with-image
+Content-Type: multipart/form-data
+
+boutiqueId: 1
+sousCategorieId: 1
+nom: "Chemise en coton"
+description: "Chemise confortable en coton bio"
+statut: "ACTIF"
+image: [fichier image]
+```
+
 **Response (201 Created):**
 ```json
 {
@@ -653,6 +730,27 @@ Content-Type: application/json
   "attributs": "{\"couleur\":\"bleu\",\"taille\":\"M\",\"matiere\":\"coton\"}",
   "image": "https://example.com/chemise-bleu.jpg"
 }
+```
+
+#### Créer un article avec upload d'image
+```http
+POST /api/articles/with-image
+Content-Type: multipart/form-data
+
+produitId: 1
+sku: "CHM-COT-001"
+prix: 29.99
+stockActuel: 50
+attributs: "{\"couleur\":\"bleu\",\"taille\":\"M\",\"matiere\":\"coton\"}"
+image: [fichier image]
+```
+
+#### Mettre à jour l'image d'un article
+```http
+POST /api/articles/{id}/image
+Content-Type: multipart/form-data
+
+image: [fichier image]
 ```
 
 **Response (201 Created):**
@@ -919,6 +1017,106 @@ GET /api/historique-stock/produit/{id}
 
 ---
 
+## Image Management APIs
+
+### Sécurité et Autorisations
+
+Le module de gestion des images utilise Spring Security avec des autorisations basées sur les rôles :
+
+#### Rôles et Permissions
+- **ADMIN** : Accès complet à toutes les fonctionnalités de gestion d'images
+- **VENDEUR** : Peut uploader et supprimer ses propres images
+- **CLIENT** : Peut valider des URLs d'images
+
+#### Endpoints Sécurisés
+
+**ADMIN et VENDEUR :**
+- `POST /api/images/upload` - Uploader une image
+- `DELETE /api/images/delete` - Supprimer une image
+
+**Tous rôles authentifiés (ADMIN, VENDEUR, CLIENT) :**
+- `GET /api/images/validate` - Valider une URL Cloudinary
+
+#### Authentification Requise
+Tous les endpoints nécessitent une authentification JWT valide.
+
+### Image APIs
+
+#### Uploader une image
+```http
+POST /api/images/upload
+Content-Type: multipart/form-data
+
+file: [fichier image]
+```
+
+**Réponse (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Image uploadée avec succès",
+  "data": {
+    "url": "https://res.cloudinary.com/drrgj1x2a/image/upload/v1234567890/tissenza/xyz123.jpg",
+    "message": "Image uploadée avec succès"
+  }
+}
+```
+
+#### Supprimer une image
+```http
+DELETE /api/images/delete?imageUrl=https://res.cloudinary.com/drrgj1x2a/image/upload/v1234567890/tissenza/xyz123.jpg
+```
+
+**Réponse (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Image supprimée avec succès",
+  "data": {
+    "deleted": true,
+    "publicId": "tissenza/xyz123",
+    "imageUrl": "https://res.cloudinary.com/drrgj1x2a/image/upload/v1234567890/tissenza/xyz123.jpg"
+  }
+}
+```
+
+#### Valider une URL Cloudinary
+```http
+GET /api/images/validate?imageUrl=https://res.cloudinary.com/drrgj1x2a/image/upload/v1234567890/tissenza/xyz123.jpg
+```
+
+**Réponse (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Validation de l'URL terminée",
+  "data": {
+    "isValid": true,
+    "isCloudinary": true,
+    "publicId": "tissenza/xyz123"
+  }
+}
+```
+
+### Configuration Cloudinary
+
+Le système utilise Cloudinary pour le stockage des images avec les paramètres suivants :
+
+- **Cloud Name** : drrgj1x2a
+- **Dossier par défaut** : tissenza
+- **Qualité automatique** : activée
+- **Format optimisé** : activé
+- **Types de fichiers supportés** : JPG, PNG, GIF, WEBP, etc.
+
+### Contraintes et Validation
+
+- **Taille maximale** : 10MB par fichier
+- **Types MIME acceptés** : image/*
+- **Format de sortie** : Optimisation automatique
+- **Stockage** : Cloudinaire CDN global
+
+---
+
 ## Module Paiement
 
 ### Sécurité et Autorisations
@@ -965,6 +1163,15 @@ Content-Type: application/json
   "nom": "Wave",
   "photo": "https://example.com/wave-logo.png"
 }
+```
+
+#### Créer un moyen de paiement avec upload de photo
+```http
+POST /api/paiement/moyens/with-photo
+Content-Type: multipart/form-data
+
+nom: "Wave"
+photo: [fichier image]
 ```
 
 **Réponse:**
@@ -1016,7 +1223,7 @@ GET /api/paiement/moyens/search?keyword=wave
 
 #### Associer un moyen de paiement à un utilisateur
 ```http
-POST /api/paiement/associations?userId=1&moyenPaiementId=2&actif=true
+POST /api/paiement/associations?userId=1&moyenPaiementId=2&actif=true&numero=771234567
 ```
 
 **Réponse:**
@@ -1033,6 +1240,7 @@ POST /api/paiement/associations?userId=1&moyenPaiementId=2&actif=true
     "moyenPaiementNom": "Wave",
     "moyenPaiementPhoto": "https://example.com/wave-logo.png",
     "actif": true,
+    "numero": "771234567",
     "createdAt": "2026-04-20T12:00:00"
   }
 }
@@ -1115,6 +1323,7 @@ GET /api/paiement/associations/user/{userId}/count
   "moyenPaiementNom": "Wave",
   "moyenPaiementPhoto": "https://example.com/wave-logo.png",
   "actif": true,
+  "numero": "771234567",
   "createdAt": "2026-04-20T12:00:00"
 }
 ```
@@ -1128,6 +1337,7 @@ GET /api/paiement/associations/user/{userId}/count
 #### UserMoyenPaiement
 - `userId` et `moyenPaiementId`: obligatoires
 - `actif`: défaut `true`
+- `numero`: optionnel, max 50 caractères
 - Contrainte unique sur `(userId, moyenPaiementId)`
 
 ---

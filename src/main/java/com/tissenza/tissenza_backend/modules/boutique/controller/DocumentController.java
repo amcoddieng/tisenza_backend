@@ -2,29 +2,75 @@ package com.tissenza.tissenza_backend.modules.boutique.controller;
 
 import com.tissenza.tissenza_backend.modules.boutique.entity.Document;
 import com.tissenza.tissenza_backend.modules.boutique.service.DocumentService;
+import com.tissenza.tissenza_backend.modules.user.entity.Personne;
+import com.tissenza.tissenza_backend.service.CloudinaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/documents")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Document Management", description = "API pour la gestion des documents")
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final CloudinaryService cloudinaryService;
 
     @PostMapping
     @Operation(summary = "Créer un nouveau document", description = "Crée un nouveau document dans le système")
     public ResponseEntity<Document> createDocument(@RequestBody Document document) {
         Document createdDocument = documentService.createDocument(document);
         return new ResponseEntity<>(createdDocument, HttpStatus.CREATED);
+    }
+
+    /**
+     * Créer un document avec upload de fichier
+     */
+    @PostMapping("/with-file")
+    @Operation(summary = "Créer un document avec fichier", description = "Crée un nouveau document avec upload de fichier sur Cloudinary")
+    public ResponseEntity<Document> createDocumentWithFile(
+            @RequestParam("personneId") Long personneId,
+            @RequestParam("type") String type,
+            @RequestParam("file") MultipartFile file) {
+        
+        try {
+            // Upload le fichier sur Cloudinary
+            String fileUrl = cloudinaryService.uploadImage(file);
+            log.info("Fichier uploadé: {}", fileUrl);
+            
+            // Créer le document avec l'URL du fichier
+            Document document = new Document();
+            
+            // Créer l'objet de relation avec la personne
+            Personne personne = new Personne();
+            personne.setId(personneId);
+            document.setPersonne(personne);
+            
+            document.setType(Document.Type.valueOf(type));
+            document.setUrl(fileUrl);
+            document.setValidated(false);
+            
+            Document createdDocument = documentService.createDocument(document);
+            return new ResponseEntity<>(createdDocument, HttpStatus.CREATED);
+            
+        } catch (IOException e) {
+            log.error("Erreur lors de l'upload du fichier: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Erreur lors de la création du document: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/{id}")
@@ -53,6 +99,36 @@ public class DocumentController {
             return ResponseEntity.ok(updatedDocument);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * Mettre à jour le fichier d'un document
+     */
+    @PostMapping("/{id}/file")
+    @Operation(summary = "Mettre à jour le fichier", description = "Upload et met à jour le fichier d'un document existant")
+    public ResponseEntity<Document> updateFile(
+            @Parameter(description = "ID du document") @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        
+        try {
+            // Upload le fichier sur Cloudinary
+            String fileUrl = cloudinaryService.uploadImage(file);
+            log.info("Fichier uploadé: {}", fileUrl);
+            
+            // Mettre à jour le document avec la nouvelle URL
+            Document documentDetails = new Document();
+            documentDetails.setUrl(fileUrl);
+            
+            Document updatedDocument = documentService.updateDocument(id, documentDetails);
+            return ResponseEntity.ok(updatedDocument);
+            
+        } catch (IOException e) {
+            log.error("Erreur lors de l'upload du fichier: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Erreur lors de la mise à jour du fichier: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

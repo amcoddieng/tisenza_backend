@@ -1,6 +1,7 @@
 package com.tissenza.tissenza_backend.modules.paiement.dto;
 
 import com.tissenza.tissenza_backend.modules.user.dto.CompteDTO;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 /**
@@ -16,6 +17,7 @@ public class UserMoyenPaiementDTO {
     private String moyenPaiementNom;
     private String moyenPaiementPhoto;
     private Boolean actif;
+    private String numero;
     private LocalDateTime createdAt;
 
     // Constructeurs
@@ -27,9 +29,16 @@ public class UserMoyenPaiementDTO {
         this.actif = actif;
     }
 
+    public UserMoyenPaiementDTO(Long userId, Long moyenPaiementId, Boolean actif, String numero) {
+        this.userId = userId;
+        this.moyenPaiementId = moyenPaiementId;
+        this.actif = actif;
+        this.numero = numero;
+    }
+
     public UserMoyenPaiementDTO(Long id, Long userId, String userEmail, String userNom,
                                Long moyenPaiementId, String moyenPaiementNom, 
-                               String moyenPaiementPhoto, Boolean actif, LocalDateTime createdAt) {
+                               String moyenPaiementPhoto, Boolean actif, String numero, LocalDateTime createdAt) {
         this.id = id;
         this.userId = userId;
         this.userEmail = userEmail;
@@ -38,6 +47,7 @@ public class UserMoyenPaiementDTO {
         this.moyenPaiementNom = moyenPaiementNom;
         this.moyenPaiementPhoto = moyenPaiementPhoto;
         this.actif = actif;
+        this.numero = numero;
         this.createdAt = createdAt;
     }
 
@@ -114,6 +124,14 @@ public class UserMoyenPaiementDTO {
         this.createdAt = createdAt;
     }
 
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
     @Override
     public String toString() {
         return "UserMoyenPaiementDTO{" +
@@ -125,6 +143,7 @@ public class UserMoyenPaiementDTO {
                 ", moyenPaiementNom='" + getMoyenPaiementNom() + '\'' +
                 ", moyenPaiementPhoto='" + getMoyenPaiementPhoto() + '\'' +
                 ", actif=" + getActif() +
+                ", numero='" + getNumero() + '\'' +
                 ", createdAt=" + getCreatedAt() +
                 '}';
     }

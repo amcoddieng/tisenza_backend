@@ -3,6 +3,7 @@ package com.tissenza.tissenza_backend.modules.paiement.entity;
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,10 @@ public class UserMoyenPaiement {
     @Column(name = "actif", nullable = false)
     private Boolean actif = true;
 
+    @Column(name = "numero")
+    @Size(max = 50, message = "Le numéro ne peut pas dépasser 50 caractères")
+    private String numero;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -46,10 +51,24 @@ public class UserMoyenPaiement {
         this.actif = true;
     }
 
+    public UserMoyenPaiement(Compte user, MoyenPaiement moyenPaiement, String numero) {
+        this.user = user;
+        this.moyenPaiement = moyenPaiement;
+        this.actif = true;
+        this.numero = numero;
+    }
+
     public UserMoyenPaiement(Compte user, MoyenPaiement moyenPaiement, Boolean actif) {
         this.user = user;
         this.moyenPaiement = moyenPaiement;
         this.actif = actif;
+    }
+
+    public UserMoyenPaiement(Compte user, MoyenPaiement moyenPaiement, Boolean actif, String numero) {
+        this.user = user;
+        this.moyenPaiement = moyenPaiement;
+        this.actif = actif;
+        this.numero = numero;
     }
 
     // Getters et Setters
@@ -91,6 +110,14 @@ public class UserMoyenPaiement {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
     }
 
     // Méthodes utilitaires

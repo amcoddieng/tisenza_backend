@@ -124,8 +124,8 @@ public class MoyenPaiementService {
      * Associe un moyen de paiement à un utilisateur
      */
     @Transactional
-    public UserMoyenPaiementDTO associateMoyenPaiementToUser(Long userId, Long moyenPaiementId, Boolean actif) {
-        log.info("Association du moyen de paiement {} à l'utilisateur {}", moyenPaiementId, userId);
+    public UserMoyenPaiementDTO associateMoyenPaiementToUser(Long userId, Long moyenPaiementId, Boolean actif, String numero) {
+        log.info("Association du moyen de paiement {} à l'utilisateur {} avec numero {}", moyenPaiementId, userId, numero);
         
         // Vérifier que l'utilisateur existe
         Compte user = compteRepository.findById(userId)
@@ -140,8 +140,8 @@ public class MoyenPaiementService {
             throw new IllegalArgumentException("Cette association existe déjà");
         }
         
-        // Créer l'association
-        UserMoyenPaiement association = new UserMoyenPaiement(user, moyenPaiement, actif != null ? actif : true);
+        // Créer l'association avec le numéro
+        UserMoyenPaiement association = new UserMoyenPaiement(user, moyenPaiement, actif != null ? actif : true, numero);
         UserMoyenPaiement saved = userMoyenPaiementRepository.save(association);
         
         return paiementMapper.toDTO(saved);

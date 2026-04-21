@@ -74,6 +74,7 @@ public class PaiementMapper {
         UserMoyenPaiementDTO dto = new UserMoyenPaiementDTO();
         dto.setId(userMoyenPaiement.getId());
         dto.setActif(userMoyenPaiement.getActif());
+        dto.setNumero(userMoyenPaiement.getNumero());
         dto.setCreatedAt(userMoyenPaiement.getCreatedAt());
 
         // Informations sur l'utilisateur
@@ -111,6 +112,7 @@ public class PaiementMapper {
         UserMoyenPaiement userMoyenPaiement = new UserMoyenPaiement();
         userMoyenPaiement.setId(dto.getId());
         userMoyenPaiement.setActif(dto.getActif());
+        userMoyenPaiement.setNumero(dto.getNumero());
         userMoyenPaiement.setCreatedAt(dto.getCreatedAt());
 
         // Note: Les relations user et moyenPaiement doivent être définies séparément

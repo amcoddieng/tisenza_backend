@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class SousCategorieController {
     private final SousCategorieService sousCategorieService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Créer une nouvelle sous-catégorie", description = "Crée une nouvelle sous-catégorie dans le système")
     public ResponseEntity<SousCategorie> createSousCategorie(@RequestBody SousCategorie sousCategorie) {
         SousCategorie createdSousCategorie = sousCategorieService.createSousCategorie(sousCategorie);
@@ -28,6 +30,7 @@ public class SousCategorieController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Récupérer une sous-catégorie par ID", description = "Retourne les détails d'une sous-catégorie spécifique")
     public ResponseEntity<SousCategorie> getSousCategorieById(
             @Parameter(description = "ID de la sous-catégorie à récupérer") @PathVariable Long id) {
@@ -37,6 +40,7 @@ public class SousCategorieController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Récupérer toutes les sous-catégories", description = "Retourne la liste de toutes les sous-catégories")
     public ResponseEntity<List<SousCategorie>> getAllSousCategories() {
         List<SousCategorie> sousCategories = sousCategorieService.getAllSousCategories();
@@ -44,6 +48,7 @@ public class SousCategorieController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Mettre à jour une sous-catégorie", description = "Met à jour les informations d'une sous-catégorie existante")
     public ResponseEntity<SousCategorie> updateSousCategorie(
             @Parameter(description = "ID de la sous-catégorie à mettre à jour") @PathVariable Long id,
@@ -57,6 +62,7 @@ public class SousCategorieController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Supprimer une sous-catégorie", description = "Supprime une sous-catégorie du système")
     public ResponseEntity<Void> deleteSousCategorie(
             @Parameter(description = "ID de la sous-catégorie à supprimer") @PathVariable Long id) {
@@ -65,6 +71,7 @@ public class SousCategorieController {
     }
 
     @GetMapping("/categorie/{categorieId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Récupérer les sous-catégories d'une catégorie", description = "Retourne la liste des sous-catégories par ID catégorie")
     public ResponseEntity<List<SousCategorie>> getSousCategoriesByCategorieId(
             @Parameter(description = "ID de la catégorie") @PathVariable Long categorieId) {
@@ -73,6 +80,7 @@ public class SousCategorieController {
     }
 
     @GetMapping("/categorie/{categorieId}/with-produits")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Récupérer les sous-catégories avec produits", description = "Retourne les sous-catégories d'une catégorie avec leurs produits")
     public ResponseEntity<List<SousCategorie>> getSousCategoriesByCategorieIdWithProduits(
             @Parameter(description = "ID de la catégorie") @PathVariable Long categorieId) {
@@ -81,6 +89,7 @@ public class SousCategorieController {
     }
 
     @GetMapping("/nom/{nom}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Récupérer une sous-catégorie par nom", description = "Retourne une sous-catégorie par son nom")
     public ResponseEntity<SousCategorie> getSousCategorieByNom(
             @Parameter(description = "Nom de la sous-catégorie") @PathVariable String nom) {
@@ -90,6 +99,7 @@ public class SousCategorieController {
     }
 
     @GetMapping("/search/nom")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Rechercher par nom", description = "Recherche des sous-catégories par nom (insensible à la casse)")
     public ResponseEntity<List<SousCategorie>> searchSousCategoriesByNom(
             @Parameter(description = "Nom à rechercher") @RequestParam String nom) {
@@ -98,6 +108,7 @@ public class SousCategorieController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Recherche par mot-clé", description = "Recherche des sous-catégories par mot-clé dans nom ou description")
     public ResponseEntity<List<SousCategorie>> searchSousCategoriesByKeyword(
             @Parameter(description = "Mot-clé de recherche") @RequestParam String keyword) {
@@ -106,6 +117,7 @@ public class SousCategorieController {
     }
 
     @GetMapping("/count/categorie/{categorieId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Compter par catégorie", description = "Compte le nombre de sous-catégories par catégorie")
     public ResponseEntity<Long> countByCategorieId(
             @Parameter(description = "ID de la catégorie") @PathVariable Long categorieId) {
@@ -114,6 +126,7 @@ public class SousCategorieController {
     }
 
     @GetMapping("/exists/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Vérifier l'existence", description = "Vérifie si une sous-catégorie existe par ID")
     public ResponseEntity<Boolean> existsById(
             @Parameter(description = "ID de la sous-catégorie à vérifier") @PathVariable Long id) {
@@ -122,6 +135,7 @@ public class SousCategorieController {
     }
 
     @GetMapping("/exists/nom/{nom}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Vérifier l'existence par nom", description = "Vérifie si une sous-catégorie existe par nom")
     public ResponseEntity<Boolean> existsByNom(
             @Parameter(description = "Nom de la sous-catégorie à vérifier") @PathVariable String nom) {

@@ -6,6 +6,7 @@ import com.tissenza.tissenza_backend.modules.paiement.dto.UserMoyenPaiementDTO;
 import com.tissenza.tissenza_backend.modules.paiement.service.MoyenPaiementService;
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
 import com.tissenza.tissenza_backend.modules.user.entity.Compte.Role;
+import com.tissenza.tissenza_backend.service.CloudinaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,6 +32,7 @@ import java.util.List;
 public class MoyenPaiementController {
 
     private final MoyenPaiementService moyenPaiementService;
+    private final CloudinaryService cloudinaryService;
 
     // ============= ENDPOINTS POUR LES MOYENS DE PAIEMENT =============
 
@@ -44,6 +48,43 @@ public class MoyenPaiementController {
         MoyenPaiementDTO created = moyenPaiementService.createMoyenPaiement(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(created, "Moyen de paiement créé avec succès"));
+    }
+
+    /**
+     * Crée un moyen de paiement avec upload de photo
+     */
+    @PostMapping("/moyens/with-photo")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<MoyenPaiementDTO>> createMoyenPaiementWithPhoto(
+            @RequestParam("nom") String nom,
+            @RequestParam(value = "photo", required = false) MultipartFile photoFile) {
+        
+        try {
+            // Upload la photo si fournie
+            String photoUrl = null;
+            if (photoFile != null && !photoFile.isEmpty()) {
+                photoUrl = cloudinaryService.uploadImage(photoFile);
+                log.info("Photo uploadée: {}", photoUrl);
+            }
+            
+            // Créer le DTO avec l'URL de la photo
+            MoyenPaiementDTO dto = new MoyenPaiementDTO();
+            dto.setNom(nom);
+            dto.setPhoto(photoUrl);
+            
+            MoyenPaiementDTO created = moyenPaiementService.createMoyenPaiement(dto);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.success(created, "Moyen de paiement créé avec succès"));
+            
+        } catch (IOException e) {
+            log.error("Erreur lors de l'upload de la photo: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Erreur lors de l'upload de la photo"));
+        } catch (Exception e) {
+            log.error("Erreur lors de la création du moyen de paiement: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Erreur lors de la création du moyen de paiement"));
+        }
     }
 
     /**
@@ -130,11 +171,12 @@ public class MoyenPaiementController {
     public ResponseEntity<ApiResponse<UserMoyenPaiementDTO>> associateMoyenPaiementToUser(
             @RequestParam Long userId,
             @RequestParam Long moyenPaiementId,
-            @RequestParam(required = false, defaultValue = "true") Boolean actif) {
-        log.info("Requête POST /api/paiement/associations - Association utilisateur {} moyen {}", userId, moyenPaiementId);
+            @RequestParam(required = false, defaultValue = "true") Boolean actif,
+            @RequestParam(required = false) String numero) {
+        log.info("Requête POST /api/paiement/associations - Association utilisateur {} moyen {} numero {}", userId, moyenPaiementId, numero);
         
         try {
-            UserMoyenPaiementDTO association = moyenPaiementService.associateMoyenPaiementToUser(userId, moyenPaiementId, actif);
+            UserMoyenPaiementDTO association = moyenPaiementService.associateMoyenPaiementToUser(userId, moyenPaiementId, actif, numero);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(association, "Association créée avec succès"));
         } catch (RuntimeException e) {
