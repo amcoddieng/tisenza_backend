@@ -81,11 +81,11 @@ public class AuthService {
 
             return new LoginResponse(
                     jwt,
-                    "Bearer",
                     compte.getId(),
                     compte.getEmail(),
                     personne.getNom() + " " + personne.getPrenom(),
                     compte.getRole().toString(),
+                    personne.getPhotoProfil(),
                     jwtUtils.getExpirationTime()
             );
 

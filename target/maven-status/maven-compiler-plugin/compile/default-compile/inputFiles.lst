@@ -4,6 +4,8 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\config\SwaggerConfig.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\response\ApiResponse.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\config\CloudinaryConfig.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\config\DataInitializer.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\config\WebConfig.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\controller\BaseController.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\controller\HelloController.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\controller\ImageController.java
@@ -89,4 +91,5 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\service\CompteService.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\service\PersonneService.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\service\CloudinaryService.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\service\LocalStorageService.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\TissenzaBackendApplication.java

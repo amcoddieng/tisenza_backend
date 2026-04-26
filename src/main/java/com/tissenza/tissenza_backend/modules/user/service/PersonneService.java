@@ -31,11 +31,30 @@ public class PersonneService {
     public Personne updatePersonne(Long id, Personne personneDetails) {
         return personneRepository.findById(id)
                 .map(personne -> {
-                    personne.setNom(personneDetails.getNom());
-                    personne.setPrenom(personneDetails.getPrenom());
-                    personne.setAdresse(personneDetails.getAdresse());
-                    personne.setPhotoProfil(personneDetails.getPhotoProfil());
-                    personne.setVille(personneDetails.getVille());
+                    if (personneDetails.getNom() != null) {
+                        personne.setNom(personneDetails.getNom());
+                    }
+                    if (personneDetails.getPrenom() != null) {
+                        personne.setPrenom(personneDetails.getPrenom());
+                    }
+                    if (personneDetails.getAdresse() != null) {
+                        personne.setAdresse(personneDetails.getAdresse());
+                    }
+                    if (personneDetails.getPhotoProfil() != null) {
+                        personne.setPhotoProfil(personneDetails.getPhotoProfil());
+                    }
+                    if (personneDetails.getVille() != null) {
+                        personne.setVille(personneDetails.getVille());
+                    }
+                    return personneRepository.save(personne);
+                })
+                .orElseThrow(() -> new RuntimeException("Personne not found with id: " + id));
+    }
+
+    public Personne updatePhotoProfil(Long id, String photoUrl) {
+        return personneRepository.findById(id)
+                .map(personne -> {
+                    personne.setPhotoProfil(photoUrl);
                     return personneRepository.save(personne);
                 })
                 .orElseThrow(() -> new RuntimeException("Personne not found with id: " + id));

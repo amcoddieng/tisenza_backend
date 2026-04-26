@@ -166,4 +166,48 @@ public class BoutiqueService {
                 })
                 .orElseThrow(() -> new RuntimeException("Boutique not found with id: " + id));
     }
+
+    /**
+     * Met à jour les informations générales d'une boutique (sauf logo, statut et note)
+     * @param id l'ID de la boutique
+     * @param nom le nouveau nom (optionnel)
+     * @param description la nouvelle description (optionnelle)
+     * @param addresse la nouvelle adresse (optionnelle)
+     * @return le DTO de la boutique mise à jour
+     */
+    @Transactional
+    public BoutiqueDTO updateInfos(Long id, String nom, String description, String addresse) {
+        return boutiqueRepository.findById(id)
+                .map(boutique -> {
+                    // Mettre à jour seulement les champs fournis
+                    if (nom != null && !nom.trim().isEmpty()) {
+                        boutique.setNom(nom);
+                    }
+                    if (description != null) {
+                        boutique.setDescription(description);
+                    }
+                    if (addresse != null && !addresse.trim().isEmpty()) {
+                        boutique.setAddresse(addresse);
+                    }
+                    return boutiqueRepository.save(boutique);
+                })
+                .map(boutiqueMapper::toDTO)
+                .orElseThrow(() -> new RuntimeException("Boutique not found with id: " + id));
+    }
+
+    /**
+     * Met à jour le statut d'une boutique
+     * @param id l'ID de la boutique
+     * @param statut le nouveau statut
+     * @return la boutique mise à jour
+     */
+    @Transactional
+    public Boutique updateStatut(Long id, Boutique.Statut statut) {
+        return boutiqueRepository.findById(id)
+                .map(boutique -> {
+                    boutique.setStatut(statut);
+                    return boutiqueRepository.save(boutique);
+                })
+                .orElseThrow(() -> new RuntimeException("Boutique not found with id: " + id));
+    }
 }

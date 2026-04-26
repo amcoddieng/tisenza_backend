@@ -17,6 +17,7 @@ com\tissenza\tissenza_backend\modules\boutique\controller\BoutiqueController.cla
 com\tissenza\tissenza_backend\common\config\SwaggerConfig.class
 com\tissenza\tissenza_backend\modules\produit\dto\HistoriqueStockDTO.class
 com\tissenza\tissenza_backend\modules\user\entity\Compte.class
+com\tissenza\tissenza_backend\config\WebConfig.class
 com\tissenza\tissenza_backend\modules\boutique\service\BoutiqueService.class
 com\tissenza\tissenza_backend\modules\produit\service\HistoriqueStockService.class
 com\tissenza\tissenza_backend\modules\user\repository\CompteRepository.class
@@ -29,6 +30,7 @@ com\tissenza\tissenza_backend\modules\produit\repository\HistoriqueStockReposito
 com\tissenza\tissenza_backend\modules\user\dto\CompteWithPersonneDTO.class
 com\tissenza\tissenza_backend\service\CloudinaryService.class
 com\tissenza\tissenza_backend\modules\boutique\entity\Boutique.class
+com\tissenza\tissenza_backend\service\LocalStorageService.class
 com\tissenza\tissenza_backend\modules\auth\security\JwtAuthenticationFilter.class
 com\tissenza\tissenza_backend\modules\boutique\entity\Boutique$Statut.class
 com\tissenza\tissenza_backend\modules\produit\entity\Categorie.class
@@ -69,6 +71,7 @@ com\tissenza\tissenza_backend\modules\paiement\repository\UserMoyenPaiementRepos
 com\tissenza\tissenza_backend\modules\user\dto\PersonneSimpleDTO.class
 com\tissenza\tissenza_backend\modules\paiement\entity\UserMoyenPaiement.class
 com\tissenza\tissenza_backend\modules\produit\service\ArticleService.class
+com\tissenza\tissenza_backend\controller\ImageController.class
 com\tissenza\tissenza_backend\modules\boutique\mapper\BoutiqueMapper.class
 com\tissenza\tissenza_backend\modules\boutique\dto\VendeurInfo.class
 com\tissenza\tissenza_backend\common\response\ApiResponse.class
@@ -85,7 +88,6 @@ com\tissenza\tissenza_backend\modules\produit\service\SousCategorieService.class
 com\tissenza\tissenza_backend\exception\ApiResponse.class
 com\tissenza\tissenza_backend\exception\GlobalExceptionHandler.class
 com\tissenza\tissenza_backend\modules\produit\entity\Produit$Statut.class
-com\tissenza\tissenza_backend\modules\auth\dto\LoginResponse.class
 com\tissenza\tissenza_backend\modules\auth\security\SecurityConfig.class
 com\tissenza\tissenza_backend\modules\user\controller\CompteController.class
 com\tissenza\tissenza_backend\modules\user\dto\CompteDTO.class

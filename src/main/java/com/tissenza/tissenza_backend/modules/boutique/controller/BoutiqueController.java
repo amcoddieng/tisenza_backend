@@ -4,7 +4,7 @@ import com.tissenza.tissenza_backend.modules.boutique.dto.BoutiqueDTO;
 import com.tissenza.tissenza_backend.modules.boutique.entity.Boutique;
 import com.tissenza.tissenza_backend.modules.boutique.service.BoutiqueService;
 import com.tissenza.tissenza_backend.exception.ApiResponse;
-import com.tissenza.tissenza_backend.service.CloudinaryService;
+import com.tissenza.tissenza_backend.service.LocalStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +26,7 @@ import java.util.List;
 public class BoutiqueController {
 
     private final BoutiqueService boutiqueService;
-    private final CloudinaryService cloudinaryService;
+    private final LocalStorageService localStorageService;
 
     @PostMapping
     @Operation(summary = "Créer une nouvelle boutique", description = "Crée une nouvelle boutique dans le système")
@@ -39,7 +39,7 @@ public class BoutiqueController {
      * Créer une boutique avec upload de logo
      */
     @PostMapping("/with-logo")
-    @Operation(summary = "Créer une boutique avec logo", description = "Crée une nouvelle boutique avec upload de logo sur Cloudinary")
+    @Operation(summary = "Créer une boutique avec logo", description = "Crée une nouvelle boutique avec upload de logo en local")
     public ResponseEntity<ApiResponse<BoutiqueDTO>> createBoutiqueWithLogo(
             @RequestParam("vendeurId") Long vendeurId,
             @RequestParam("nom") String nom,
@@ -53,7 +53,7 @@ public class BoutiqueController {
             // Upload le logo si fourni
             String logoUrl = null;
             if (logoFile != null && !logoFile.isEmpty()) {
-                logoUrl = cloudinaryService.uploadImage(logoFile);
+                logoUrl = localStorageService.storeFile(logoFile, LocalStorageService.FileType.PRODUIT);
                 log.info("Logo uploadé: {}", logoUrl);
             }
             
@@ -120,8 +120,8 @@ public class BoutiqueController {
             @RequestParam("logo") MultipartFile logoFile) {
         
         try {
-            // Upload le logo sur Cloudinary
-            String logoUrl = cloudinaryService.uploadImage(logoFile);
+            // Upload le logo localement
+            String logoUrl = localStorageService.storeFile(logoFile, LocalStorageService.FileType.PRODUIT);
             log.info("Logo uploadé: {}", logoUrl);
             
             // Mettre à jour la boutique avec la nouvelle URL
@@ -221,40 +221,58 @@ public class BoutiqueController {
         return ResponseEntity.ok(exists);
     }
 
-    @PutMapping("/{id}/validate")
-    @Operation(summary = "Valider une boutique", description = "Change le statut d'une boutique à VALIDÉ")
-    public ResponseEntity<Boutique> validateBoutique(
-            @Parameter(description = "ID de la boutique à valider") @PathVariable Long id) {
-        try {
-            Boutique validatedBoutique = boutiqueService.validateBoutique(id);
-            return ResponseEntity.ok(validatedBoutique);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @PutMapping("/{id}/refuse")
-    @Operation(summary = "Refuser une boutique", description = "Change le statut d'une boutique à REFUSÉ")
-    public ResponseEntity<Boutique> refuseBoutique(
-            @Parameter(description = "ID de la boutique à refuser") @PathVariable Long id) {
-        try {
-            Boutique refusedBoutique = boutiqueService.refuseBoutique(id);
-            return ResponseEntity.ok(refusedBoutique);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
+    
     @PutMapping("/{id}/note")
     @Operation(summary = "Mettre à jour la note", description = "Met à jour la note d'une boutique")
-    public ResponseEntity<Boutique> updateNote(
+    public ResponseEntity<ApiResponse<Boutique>> updateNote(
             @Parameter(description = "ID de la boutique") @PathVariable Long id,
             @Parameter(description = "Nouvelle note") @RequestParam Float note) {
         try {
             Boutique updatedBoutique = boutiqueService.updateNote(id, note);
-            return ResponseEntity.ok(updatedBoutique);
+            return ResponseEntity.ok(ApiResponse.success(updatedBoutique, "Note mise à jour avec succès"));
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Boutique non trouvée"));
+        }
+    }
+
+    /**
+     * Mettre à jour les informations générales d'une boutique (sauf logo, statut et note)
+     */
+    @PutMapping("/{id}/infos")
+    @Operation(summary = "Mettre à jour les informations", description = "Met à jour les informations générales d'une boutique (nom, description, adresse)")
+    public ResponseEntity<ApiResponse<BoutiqueDTO>> updateInfos(
+            @Parameter(description = "ID de la boutique") @PathVariable Long id,
+            @Parameter(description = "Nouveau nom") @RequestParam(required = false) String nom,
+            @Parameter(description = "Nouvelle description") @RequestParam(required = false) String description,
+            @Parameter(description = "Nouvelle adresse") @RequestParam(required = false) String addresse) {
+        try {
+            BoutiqueDTO updatedBoutique = boutiqueService.updateInfos(id, nom, description, addresse);
+            return ResponseEntity.ok(ApiResponse.success(updatedBoutique, "Informations mises à jour avec succès"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Boutique non trouvée"));
+        }
+    }
+
+    /**
+     * Mettre à jour le statut d'une boutique
+     */
+    @PutMapping("/{id}/statut")
+    @Operation(summary = "Mettre à jour le statut", description = "Met à jour le statut d'une boutique")
+    public ResponseEntity<ApiResponse<Boutique>> updateStatut(
+            @Parameter(description = "ID de la boutique") @PathVariable Long id,
+            @Parameter(description = "Nouveau statut") @RequestParam String statut) {
+        try {
+            Boutique.Statut newStatut = Boutique.Statut.valueOf(statut.toUpperCase());
+            Boutique updatedBoutique = boutiqueService.updateStatut(id, newStatut);
+            return ResponseEntity.ok(ApiResponse.success(updatedBoutique, "Statut mis à jour avec succès"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Statut invalide. Valeurs possibles: EN_ATTENTE, VALIDE, REFUSE, SUSPENDU"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Boutique non trouvée"));
         }
     }
 }

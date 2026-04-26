@@ -36,6 +36,7 @@ Content-Type: application/json
     "email": "john.doe@example.com",
     "username": "Doe John",
     "role": "CLIENT",
+    "photoProfil": "/uploads/40e85e63-3383-4f84-a7c3-b72b96040fcc.jpeg",
     "expiresIn": 86400000
   }
 }
@@ -261,16 +262,25 @@ Content-Type: multipart/form-data
 photoProfil: [fichier image]
 ```
 
-**Response (201 Created):**
+**Description:**
+- Upload une photo de profil et la stocke localement
+- Le fichier est sauvegardé dans le répertoire `/uploads/`
+- Retourne l'URL d'accès à la photo
+
+**Response (200 OK):**
 ```json
 {
-  "id": 1,
-  "nom": "Doe",
+  "success": true,
+  "message": "Photo de profil mise à jour avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Doe",
   "prenom": "John",
   "email": "john.doe@example.com",
   "telephone": "+221771234567",
   "dateNaissance": "1990-05-15",
   "adresse": "Dakar, Sénégal",
+  "photoProfil": "/uploads/40e85e63-3383-4f84-a7c3-b72b96040fcc.jpeg",
   "createdAt": "2026-04-13T01:50:00"
 }
 ```
@@ -367,39 +377,135 @@ PUT /api/comptes/1/verify
 
 ### Boutique APIs
 
-#### Créer une boutique
+#### Créer une boutique avec logo
 ```http
-POST /api/boutiques
-Content-Type: application/json
+POST /api/boutiques/with-logo
+Content-Type: multipart/form-data
 
-{
-  "vendeur": {
-    "id": 1
-  },
-  "nom": "Ma Boutique",
-  "description": "Boutique de vêtements",
-  "addresse": "Dakar, Plateau",
-  "logo": "https://example.com/logo.png"
-}
+vendeurId: 1
+nom: "Ma Boutique"
+description: "Boutique de vêtements"
+addresse: "Dakar, Plateau"
+statut: "EN_ATTENTE"
+note: 4.5
+logo: [fichier image]
 ```
 
 **Response (201 Created):**
 ```json
 {
-  "id": 1,
-  "vendeur": {
-    "id": 1
-  },
-  "nom": "Ma Boutique",
-  "description": "Boutique de vêtements",
-  "addresse": "Dakar, Plateau",
-  "logo": "https://example.com/logo.png",
-  "statut": "EN_ATTENTE",
-  "createdAt": "2026-04-13T01:50:00"
+  "success": true,
+  "message": "Boutique créée avec succès",
+  "data": {
+    "id": 1,
+    "vendeur": {
+      "id": 1
+    },
+    "nom": "Ma Boutique",
+    "description": "Boutique de vêtements",
+    "addresse": "Dakar, Plateau",
+    "logo": "/uploads/produit/uuid.jpg",
+    "statut": "EN_ATTENTE",
+    "note": 4.5,
+    "createdAt": "2026-04-26T15:57:33"
+  }
 }
 ```
 
-#### Modifier une boutique
+#### Mettre à jour le logo d'une boutique
+```http
+POST /api/boutiques/{id}/logo
+Content-Type: multipart/form-data
+
+logo: [fichier image]
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Logo mis à jour avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Ma Boutique",
+    "logo": "/uploads/produit/nouveau-uuid.jpg",
+    "statut": "VALIDE",
+    "note": 4.5
+  }
+}
+```
+
+#### Mettre à jour les informations générales d'une boutique
+```http
+PUT /api/boutiques/{id}/infos
+Content-Type: application/x-www-form-urlencoded
+
+nom=Nouveau nom&description=Nouvelle description&addresse=Nouvelle adresse
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Informations mises à jour avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Nouveau nom",
+    "description": "Nouvelle description",
+    "addresse": "Nouvelle adresse",
+    "logo": "/uploads/produit/existing-logo.jpg",
+    "statut": "VALIDE",
+    "note": 4.5,
+    "createdAt": "2026-04-26T15:57:33"
+  }
+}
+```
+
+#### Mettre à jour la note d'une boutique
+```http
+PUT /api/boutiques/{id}/note?note=4.8
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Note mise à jour avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Ma Boutique",
+    "note": 4.8,
+    "statut": "VALIDE"
+  }
+}
+```
+
+#### Mettre à jour le statut d'une boutique
+```http
+PUT /api/boutiques/{id}/statut?statut=VALIDE
+```
+
+**Statuts possibles:**
+- `EN_ATTENTE`
+- `VALIDE`
+- `REFUSE`
+- `SUSPENDU`
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Statut mis à jour avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Ma Boutique",
+    "statut": "VALIDE",
+    "note": 4.5
+  }
+}
+```
+
+#### Modifier une boutique (complète)
 ```http
 PUT /api/boutiques/{id}
 Authorization: Bearer <token_jwt>
@@ -418,44 +524,144 @@ Content-Type: application/json
 }
 ```
 
-#### Créer une boutique avec upload de logo
-```http
-POST /api/boutiques/with-logo
-Content-Type: multipart/form-data
-
-vendeurId: 123
-nom: "Nouveau nom de boutique"
-description: "Nouvelle description"
-addresse: "Nouvelle adresse"
-statut: "VALIDE"
-note: 4.5
-logo: [fichier image]
-```
-
-#### Mettre à jour le logo d'une boutique
-```http
-POST /api/boutiques/{id}/logo
-Content-Type: multipart/form-data
-
-logo: [fichier image]
-```
-
-#### Valider/Refuser une boutique
-```http
-PUT /api/boutiques/{id}/validate
-PUT /api/boutiques/{id}/refuse
-```
-
-#### Mettre à jour la note
+#### Mettre à jour la note d'une boutique
 ```http
 PUT /api/boutiques/{id}/note?note=4.5
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Note mise à jour avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Ma Boutique",
+    "note": 4.8,
+    "statut": "VALIDE"
+  }
+}
+```
+
+#### Mettre à jour le statut d'une boutique
+```http
+PUT /api/boutiques/{id}/statut?statut=VALIDE
+```
+
+**Statuts possibles:**
+- `EN_ATTENTE`
+- `VALIDE`
+- `REFUSE`
+- `SUSPENDU`
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Statut mis à jour avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Ma Boutique",
+    "statut": "VALIDE",
+    "note": 4.5
+  }
+}
+```
+
+#### Mettre à jour les informations générales d'une boutique
+```http
+PUT /api/boutiques/{id}/infos
+Content-Type: application/x-www-form-urlencoded
+
+nom=Nouveau nom&description=Nouvelle description&addresse=Nouvelle adresse
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Informations mises à jour avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Nouveau nom",
+    "description": "Nouvelle description",
+    "addresse": "Nouvelle adresse",
+    "logo": "/uploads/produit/existing-logo.jpg",
+    "statut": "VALIDE",
+    "note": 4.5,
+    "createdAt": "2026-04-26T15:57:33"
+  }
+}
+```
+
+#### Récupérer les boutiques d'un vendeur
+```http
+GET /api/boutiques/vendeur/{vendeurId}
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "nom": "Ma Boutique",
+    "description": "Boutique de vêtements",
+    "addresse": "Dakar, Plateau",
+    "logo": "/uploads/produit/uuid.jpg",
+    "statut": "VALIDE",
+    "note": 4.5,
+    "createdAt": "2026-04-26T15:57:33",
+    "vendeur": {
+      "id": 1,
+      "email": "vendeur@example.com"
+    }
+  },
+  {
+    "id": 2,
+    "nom": "Deuxième Boutique",
+    "description": "Accessoires de mode",
+    "addresse": "Dakar, Almadies",
+    "logo": "/uploads/produit/uuid2.jpg",
+    "statut": "EN_ATTENTE",
+    "note": 4.2,
+    "createdAt": "2026-04-26T16:00:00",
+    "vendeur": {
+      "id": 1,
+      "email": "vendeur@example.com"
+    }
+  }
+]
+```
+
+**Response (404 Not Found) si le vendeur n'existe pas:**
+```json
+{
+  "success": false,
+  "message": "Vendeur non trouvé",
+  "data": null
+}
+```
+
+#### Vérifier si un vendeur a une boutique
+```http
+GET /api/boutiques/exists/vendeur/{vendeurId}
+```
+
+**Response (200 OK):**
+```json
+true
+```
+
+ou
+
+```json
+false
 ```
 
 #### Rechercher des boutiques
 ```http
 GET /api/boutiques/search?keyword=vêtements
 GET /api/boutiques/statut/VALIDE
-GET /api/boutiques/vendeur/1
 ```
 
 ---
@@ -552,9 +758,64 @@ Tous les endpoints de catégories et sous-catégories nécessitent une authentif
 
 ### Catégorie APIs
 
+#### Lister toutes les catégories
+```http
+GET /api/categories
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "nom": "Vêtements Hommes",
+    "description": "Collection complète de vêtements pour hommes",
+    "createdAt": "2026-04-26T17:15:55"
+  },
+  {
+    "id": 2,
+    "nom": "Vêtements Femmes",
+    "description": "Mode féminine tendance et élégante",
+    "createdAt": "2026-04-26T17:15:55"
+  }
+]
+```
+
+#### Lister les catégories avec sous-catégories
+```http
+GET /api/categories/with-sous-categories
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "nom": "Vêtements Hommes",
+    "description": "Collection complète de vêtements pour hommes",
+    "createdAt": "2026-04-26T17:15:55",
+    "sousCategories": [
+      {
+        "id": 1,
+        "nom": "Chemises",
+        "description": "Chemises formelles et décontractées pour hommes"
+      },
+      {
+        "id": 2,
+        "nom": "T-shirts",
+        "description": "T-shirts et débardeurs pour hommes"
+      }
+    ]
+  }
+]
+```
+
 #### Créer une catégorie
 ```http
 POST /api/categories
+Authorization: Bearer <token_jwt>
 Content-Type: application/json
 
 {
@@ -569,24 +830,25 @@ Content-Type: application/json
   "id": 1,
   "nom": "Vêtements",
   "description": "Catégorie de vêtements pour hommes et femmes",
-  "createdAt": "2026-04-13T01:50:00"
+  "createdAt": "2026-04-26T17:15:55"
 }
-```
-
-#### Lister les catégories avec sous-catégories
-```http
-GET /api/categories/with-sous-categories
 ```
 
 #### Rechercher des catégories
 ```http
 GET /api/categories/search?keyword=vêtements
+Authorization: Bearer <token_jwt>
+```
+
+```http
 GET /api/categories/nom/Vêtements
+Authorization: Bearer <token_jwt>
 ```
 
 #### Modifier une catégorie
 ```http
 PUT /api/categories/{id}
+Authorization: Bearer <token_jwt>
 Content-Type: application/json
 
 {
@@ -597,9 +859,103 @@ Content-Type: application/json
 
 ### Sous-Catégorie APIs
 
+#### Lister toutes les sous-catégories
+```http
+GET /api/sous-categories
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "nom": "Chemises",
+    "description": "Chemises formelles et décontractées pour hommes",
+    "categorie": {
+      "id": 1,
+      "nom": "Vêtements Hommes"
+    },
+    "createdAt": "2026-04-26T17:15:55"
+  },
+  {
+    "id": 2,
+    "nom": "T-shirts",
+    "description": "T-shirts et débardeurs pour hommes",
+    "categorie": {
+      "id": 1,
+      "nom": "Vêtements Hommes"
+    },
+    "createdAt": "2026-04-26T17:15:55"
+  }
+]
+```
+
+#### Lister les sous-catégories d'une catégorie
+```http
+GET /api/sous-categories/categorie/{categorieId}
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "nom": "Chemises",
+    "description": "Chemises formelles et décontractées pour hommes",
+    "categorie": {
+      "id": 1,
+      "nom": "Vêtements Hommes"
+    },
+    "createdAt": "2026-04-26T17:15:55"
+  },
+  {
+    "id": 2,
+    "nom": "T-shirts",
+    "description": "T-shirts et débardeurs pour hommes",
+    "categorie": {
+      "id": 1,
+      "nom": "Vêtements Hommes"
+    },
+    "createdAt": "2026-04-26T17:15:55"
+  }
+]
+```
+
+#### Lister les sous-catégories d'une catégorie avec produits
+```http
+GET /api/sous-categories/categorie/{categorieId}/with-produits
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "nom": "Chemises",
+    "description": "Chemises formelles et décontractées pour hommes",
+    "categorie": {
+      "id": 1,
+      "nom": "Vêtements Hommes"
+    },
+    "createdAt": "2026-04-26T17:15:55",
+    "produits": [
+      {
+        "id": 1,
+        "nom": "Chemise blanche",
+        "prix": 2500.00
+      }
+    ]
+  }
+]
+```
+
 #### Créer une sous-catégorie
 ```http
 POST /api/sous-categories
+Authorization: Bearer <token_jwt>
 Content-Type: application/json
 
 {
@@ -607,6 +963,45 @@ Content-Type: application/json
   "nom": "T-shirts",
   "description": "T-shirts pour hommes"
 }
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "categorieId": 1,
+  "nom": "T-shirts",
+  "description": "T-shirts pour hommes",
+  "createdAt": "2026-04-26T17:15:55"
+}
+```
+
+#### Lister les sous-catégories
+```http
+GET /api/sous-categories
+GET /api/sous-categories/categorie/1
+```
+
+#### Modifier une sous-catégorie
+```http
+PUT /api/sous-categories/{id}
+Authorization: Bearer <token_jwt>
+Content-Type: application/json
+
+{
+  "categorieId": 1,
+  "nom": "Polo shirts",
+  "description": "Polo shirts pour hommes"
+}
+```
+
+#### Supprimer une sous-catégorie
+```http
+DELETE /api/sous-categories/{id}
+Authorization: Bearer <token_jwt>
+```
+
+**Response (204 No Content)**
 ```
 
 #### Lister les sous-catégories

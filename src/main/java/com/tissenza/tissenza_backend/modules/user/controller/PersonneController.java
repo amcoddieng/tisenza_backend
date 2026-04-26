@@ -3,7 +3,7 @@ package com.tissenza.tissenza_backend.modules.user.controller;
 import com.tissenza.tissenza_backend.modules.user.entity.Personne;
 import com.tissenza.tissenza_backend.modules.user.service.PersonneService;
 import com.tissenza.tissenza_backend.exception.ApiResponse;
-import com.tissenza.tissenza_backend.service.CloudinaryService;
+import com.tissenza.tissenza_backend.service.LocalStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +25,7 @@ import java.util.List;
 public class PersonneController {
 
     private final PersonneService personneService;
-    private final CloudinaryService cloudinaryService;
+    private final LocalStorageService localStorageService;
 
     @PostMapping
     @Operation(summary = "Créer une nouvelle personne", description = "Crée une nouvelle personne dans le système")
@@ -44,15 +44,12 @@ public class PersonneController {
             @RequestParam("photoProfil") MultipartFile photoFile) {
         
         try {
-            // Upload la photo sur Cloudinary
-            String photoUrl = cloudinaryService.uploadImage(photoFile);
+            // Upload la photo localement dans le dossier profil
+            String photoUrl = localStorageService.storeFile(photoFile, LocalStorageService.FileType.PROFIL);
             log.info("Photo de profil uploadée: {}", photoUrl);
             
-            // Mettre à jour la personne avec la nouvelle URL
-            Personne personneDetails = new Personne();
-            personneDetails.setPhotoProfil(photoUrl);
-            
-            Personne updatedPersonne = personneService.updatePersonne(id, personneDetails);
+            // Mettre à jour uniquement la photo de profil
+            Personne updatedPersonne = personneService.updatePhotoProfil(id, photoUrl);
             return ResponseEntity.ok(ApiResponse.success(updatedPersonne, "Photo de profil mise à jour avec succès"));
             
         } catch (IOException e) {

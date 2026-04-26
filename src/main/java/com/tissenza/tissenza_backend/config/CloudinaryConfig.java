@@ -11,16 +11,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CloudinaryConfig {
 
-    @Value("${CLOUDINARY_URL}")
-    private String cloudinaryUrl;
-
-    @Value("${cloudinary.cloud-name}")
+    @Value("${cloudinary.cloud_name:}")
     private String cloudName;
 
-    @Value("${cloudinary.api-key}")
+    @Value("${cloudinary.api_key:}")
     private String apiKey;
 
-    @Value("${cloudinary.api-secret}")
+    @Value("${cloudinary.api_secret:}")
     private String apiSecret;
 
     /**
@@ -28,19 +25,13 @@ public class CloudinaryConfig {
      */
     @Bean
     public Cloudinary cloudinary() {
-        Cloudinary cloudinary = new Cloudinary(cloudinaryUrl);
-        
-        // Configuration alternative si l'URL n'est pas disponible
-        if (cloudinary.config == null || cloudinary.config.cloudName == null) {
-            cloudinary = new Cloudinary(
-                java.util.Map.of(
-                    "cloud_name", cloudName,
-                    "api_key", apiKey,
-                    "api_secret", apiSecret
-                )
-            );
-        }
-        
-        return cloudinary;
+        // Configuration individuelle
+        return new Cloudinary(
+            java.util.Map.of(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret
+            )
+        );
     }
 }
