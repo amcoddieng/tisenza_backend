@@ -37,6 +37,7 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\entity\Boutique.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\entity\Document.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\mapper\BoutiqueMapper.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\mapper\DocumentMapper.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\repository\BoutiqueRepository.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\repository\DocumentRepository.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\service\BoutiqueService.java
@@ -55,6 +56,7 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\HistoriqueStockController.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\ProduitController.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\SousCategorieController.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\converter\JsonStringConverter.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ArticleDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\CategorieDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\HistoriqueStockDTO.java
@@ -66,6 +68,9 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\HistoriqueStock.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\Produit.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\SousCategorie.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\ArticleMapper.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\CategorieMapper.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\ProduitMapper.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\ArticleRepository.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\CategorieRepository.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\HistoriqueStockRepository.java

@@ -1,10 +1,11 @@
 package com.tissenza.tissenza_backend.modules.produit.controller;
 
+import com.tissenza.tissenza_backend.modules.produit.dto.ProduitDTO;
 import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
 import com.tissenza.tissenza_backend.modules.produit.entity.SousCategorie;
 import com.tissenza.tissenza_backend.modules.produit.service.ProduitService;
 import com.tissenza.tissenza_backend.modules.boutique.entity.Boutique;
-import com.tissenza.tissenza_backend.service.CloudinaryService;
+import com.tissenza.tissenza_backend.service.LocalStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,12 +28,12 @@ import java.util.List;
 public class ProduitController {
 
     private final ProduitService produitService;
-    private final CloudinaryService cloudinaryService;
+    private final LocalStorageService localStorageService;
 
     @PostMapping
     @Operation(summary = "Créer un nouveau produit", description = "Crée un nouveau produit dans le système")
-    public ResponseEntity<Produit> createProduit(@RequestBody Produit produit) {
-        Produit createdProduit = produitService.createProduit(produit);
+    public ResponseEntity<ProduitDTO> createProduit(@RequestBody Produit produit) {
+        ProduitDTO createdProduit = produitService.createProduitDTO(produit);
         return new ResponseEntity<>(createdProduit, HttpStatus.CREATED);
     }
 
@@ -39,8 +41,8 @@ public class ProduitController {
      * Créer un produit avec upload d'image
      */
     @PostMapping("/with-image")
-    @Operation(summary = "Créer un produit avec image", description = "Crée un nouveau produit avec upload d'image sur Cloudinary")
-    public ResponseEntity<Produit> createProduitWithImage(
+    @Operation(summary = "Créer un produit avec image", description = "Crée un nouveau produit avec stockage d'image en local")
+    public ResponseEntity<ProduitDTO> createProduitWithImage(
             @RequestParam("boutiqueId") Long boutiqueId,
             @RequestParam("sousCategorieId") Long sousCategorieId,
             @RequestParam("nom") String nom,
@@ -49,11 +51,11 @@ public class ProduitController {
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
         
         try {
-            // Upload l'image si fournie
+            // Stocker l'image en local si fournie
             String imageUrl = null;
             if (imageFile != null && !imageFile.isEmpty()) {
-                imageUrl = cloudinaryService.uploadImage(imageFile);
-                log.info("Image uploadée: {}", imageUrl);
+                imageUrl = localStorageService.storeFile(imageFile, LocalStorageService.FileType.PRODUIT);
+                log.info("Image stockée en local: {}", imageUrl);
             }
             
             // Créer le produit avec l'URL de l'image
@@ -73,7 +75,7 @@ public class ProduitController {
             produit.setStatut(Produit.Statut.valueOf(statut));
             produit.setImage(imageUrl);
             
-            Produit createdProduit = produitService.createProduit(produit);
+            ProduitDTO createdProduit = produitService.createProduitDTO(produit);
             return new ResponseEntity<>(createdProduit, HttpStatus.CREATED);
             
         } catch (IOException e) {
@@ -87,36 +89,36 @@ public class ProduitController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Récupérer un produit par ID", description = "Retourne les détails d'un produit spécifique")
-    public ResponseEntity<Produit> getProduitById(
+    public ResponseEntity<ProduitDTO> getProduitById(
             @Parameter(description = "ID du produit à récupérer") @PathVariable Long id) {
-        return produitService.getProduitById(id)
+        return produitService.getProduitByIdDTO(id)
                 .map(produit -> ResponseEntity.ok(produit))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}/with-articles")
     @Operation(summary = "Récupérer un produit avec ses articles", description = "Retourne un produit avec ses articles chargés")
-    public ResponseEntity<Produit> getProduitByIdWithArticles(
+    public ResponseEntity<ProduitDTO> getProduitByIdWithArticles(
             @Parameter(description = "ID du produit à récupérer") @PathVariable Long id) {
-        return produitService.getProduitByIdWithArticles(id)
+        return produitService.getProduitByIdWithArticlesDTO(id)
                 .map(produit -> ResponseEntity.ok(produit))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
     @Operation(summary = "Récupérer tous les produits", description = "Retourne la liste de tous les produits")
-    public ResponseEntity<List<Produit>> getAllProduits() {
-        List<Produit> produits = produitService.getAllProduits();
+    public ResponseEntity<List<ProduitDTO>> getAllProduits() {
+        List<ProduitDTO> produits = produitService.getAllProduitsDTO();
         return ResponseEntity.ok(produits);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Mettre à jour un produit", description = "Met à jour les informations d'un produit existant")
-    public ResponseEntity<Produit> updateProduit(
+    public ResponseEntity<ProduitDTO> updateProduit(
             @Parameter(description = "ID du produit à mettre à jour") @PathVariable Long id,
             @RequestBody Produit produitDetails) {
         try {
-            Produit updatedProduit = produitService.updateProduit(id, produitDetails);
+            ProduitDTO updatedProduit = produitService.updateProduitDTO(id, produitDetails);
             return ResponseEntity.ok(updatedProduit);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -133,59 +135,83 @@ public class ProduitController {
 
     @GetMapping("/boutique/{boutiqueId}")
     @Operation(summary = "Récupérer les produits d'une boutique", description = "Retourne la liste des produits par ID boutique")
-    public ResponseEntity<List<Produit>> getProduitsByBoutiqueId(
+    public ResponseEntity<List<ProduitDTO>> getProduitsByBoutiqueId(
             @Parameter(description = "ID de la boutique") @PathVariable Long boutiqueId) {
-        List<Produit> produits = produitService.getProduitsByBoutiqueId(boutiqueId);
+        List<ProduitDTO> produits = produitService.getProduitsByBoutiqueIdDTO(boutiqueId);
         return ResponseEntity.ok(produits);
     }
 
     @GetMapping("/sous-categorie/{sousCategorieId}")
-    @Operation(summary = "Récupérer les produits d'une sous-catégorie", description = "Retourne la liste des produits par ID sous-catégorie")
-    public ResponseEntity<List<Produit>> getProduitsBySousCategorieId(
+    @Operation(summary = "Récupérer les produits d'une sous-catégorie", description = "Retourne la liste des produits par ID sous-catégorie en DTO")
+    public ResponseEntity<List<ProduitDTO>> getProduitsBySousCategorieId(
             @Parameter(description = "ID de la sous-catégorie") @PathVariable Long sousCategorieId) {
-        List<Produit> produits = produitService.getProduitsBySousCategorieId(sousCategorieId);
+        List<ProduitDTO> produits = produitService.getProduitsBySousCategorieIdDTO(sousCategorieId);
         return ResponseEntity.ok(produits);
     }
 
     @GetMapping("/statut/{statut}")
-    @Operation(summary = "Récupérer des produits par statut", description = "Retourne la liste des produits par statut")
-    public ResponseEntity<List<Produit>> getProduitsByStatut(
+    @Operation(summary = "Récupérer des produits par statut", description = "Retourne la liste des produits par statut en DTO")
+    public ResponseEntity<List<ProduitDTO>> getProduitsByStatut(
             @Parameter(description = "Statut à rechercher") @PathVariable Produit.Statut statut) {
-        List<Produit> produits = produitService.getProduitsByStatut(statut);
+        List<ProduitDTO> produits = produitService.getProduitsByStatutDTO(statut);
         return ResponseEntity.ok(produits);
     }
 
     @GetMapping("/nom/{nom}")
-    @Operation(summary = "Récupérer un produit par nom", description = "Retourne un produit par son nom")
-    public ResponseEntity<Produit> getProduitByNom(
+    @Operation(summary = "Récupérer un produit par nom", description = "Retourne un produit par son nom en DTO")
+    public ResponseEntity<ProduitDTO> getProduitByNom(
             @Parameter(description = "Nom du produit") @PathVariable String nom) {
-        return produitService.getProduitByNom(nom)
+        return produitService.getProduitByNomDTO(nom)
                 .map(produit -> ResponseEntity.ok(produit))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/search/nom")
-    @Operation(summary = "Rechercher par nom", description = "Recherche des produits par nom (insensible à la casse)")
-    public ResponseEntity<List<Produit>> searchProduitsByNom(
+    @Operation(summary = "Rechercher par nom", description = "Recherche des produits par nom (insensible à la casse) en DTO")
+    public ResponseEntity<List<ProduitDTO>> searchProduitsByNom(
             @Parameter(description = "Nom à rechercher") @RequestParam String nom) {
-        List<Produit> produits = produitService.searchProduitsByNom(nom);
+        List<ProduitDTO> produits = produitService.searchProduitsByNomDTO(nom);
         return ResponseEntity.ok(produits);
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Recherche par mot-clé", description = "Recherche des produits par mot-clé dans nom ou description")
-    public ResponseEntity<List<Produit>> searchProduitsByKeyword(
+    @Operation(summary = "Recherche par mot-clé", description = "Recherche des produits par mot-clé dans nom ou description en DTO")
+    public ResponseEntity<List<ProduitDTO>> searchProduitsByKeyword(
             @Parameter(description = "Mot-clé de recherche") @RequestParam String keyword) {
-        List<Produit> produits = produitService.searchProduitsByKeyword(keyword);
+        List<ProduitDTO> produits = produitService.searchProduitsByKeywordDTO(keyword);
+        return ResponseEntity.ok(produits);
+    }
+
+    // ========== NOUVELLES APIS DE RECHERCHE COMBINÉE ==========
+
+    @GetMapping("/search/combined")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Recherche combinée", description = "Recherche des produits par boutique, sous-catégorie et nom (paramètres optionnels)")
+    public ResponseEntity<List<ProduitDTO>> searchProduitsByMultipleCriteria(
+            @Parameter(description = "ID de la boutique (optionnel)") @RequestParam(required = false) Long boutiqueId,
+            @Parameter(description = "ID de la sous-catégorie (optionnel)") @RequestParam(required = false) Long sousCategorieId,
+            @Parameter(description = "Nom à rechercher (optionnel)") @RequestParam(required = false) String nom) {
+        List<ProduitDTO> produits = produitService.searchProduitsByMultipleCriteriaDTO(boutiqueId, sousCategorieId, nom);
+        return ResponseEntity.ok(produits);
+    }
+
+    @GetMapping("/search/boutique-souscategorie-nom")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Recherche boutique + sous-catégorie + nom", description = "Recherche des produits par boutique, sous-catégorie et nom (LIKE) - tous obligatoires")
+    public ResponseEntity<List<ProduitDTO>> searchProduitsByBoutiqueSousCategorieAndNom(
+            @Parameter(description = "ID de la boutique") @RequestParam Long boutiqueId,
+            @Parameter(description = "ID de la sous-catégorie") @RequestParam Long sousCategorieId,
+            @Parameter(description = "Nom à rechercher") @RequestParam String nom) {
+        List<ProduitDTO> produits = produitService.searchProduitsByBoutiqueSousCategorieAndNomDTO(boutiqueId, sousCategorieId, nom);
         return ResponseEntity.ok(produits);
     }
 
     @GetMapping("/boutique/{boutiqueId}/statut/{statut}")
     @Operation(summary = "Récupérer des produits par boutique et statut", description = "Retourne les produits par boutique et statut")
-    public ResponseEntity<List<Produit>> getProduitsByBoutiqueIdAndStatut(
+    public ResponseEntity<List<ProduitDTO>> getProduitsByBoutiqueIdAndStatut(
             @Parameter(description = "ID de la boutique") @PathVariable Long boutiqueId,
             @Parameter(description = "Statut à rechercher") @PathVariable Produit.Statut statut) {
-        List<Produit> produits = produitService.getProduitsByBoutiqueIdAndStatut(boutiqueId, statut);
+        List<ProduitDTO> produits = produitService.getProduitsByBoutiqueIdAndStatutDTO(boutiqueId, statut);
         return ResponseEntity.ok(produits);
     }
 
@@ -238,10 +264,10 @@ public class ProduitController {
 
     @PutMapping("/{id}/activate")
     @Operation(summary = "Activer un produit", description = "Change le statut d'un produit à ACTIF")
-    public ResponseEntity<Produit> activateProduit(
+    public ResponseEntity<ProduitDTO> activateProduit(
             @Parameter(description = "ID du produit à activer") @PathVariable Long id) {
         try {
-            Produit activatedProduit = produitService.activateProduit(id);
+            ProduitDTO activatedProduit = produitService.activateProduitDTO(id);
             return ResponseEntity.ok(activatedProduit);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -250,10 +276,10 @@ public class ProduitController {
 
     @PutMapping("/{id}/deactivate")
     @Operation(summary = "Désactiver un produit", description = "Change le statut d'un produit à INACTIF")
-    public ResponseEntity<Produit> deactivateProduit(
+    public ResponseEntity<ProduitDTO> deactivateProduit(
             @Parameter(description = "ID du produit à désactiver") @PathVariable Long id) {
         try {
-            Produit deactivatedProduit = produitService.deactivateProduit(id);
+            ProduitDTO deactivatedProduit = produitService.deactivateProduitDTO(id);
             return ResponseEntity.ok(deactivatedProduit);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

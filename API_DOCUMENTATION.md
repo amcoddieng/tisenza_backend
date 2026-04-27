@@ -1,5 +1,44 @@
 # Tissenza Backend API Documentation
 
+## 🆕 Nouvelles Fonctionnalités - Mise à Jour 2026-04-26
+
+### ✅ DTO Pattern Complètement Implémenté
+Toutes les APIs de lecture utilisent maintenant des DTOs pour éviter les `LazyInitializationException` et améliorer la performance.
+
+### ✅ Accès Élargi pour Tous
+Les endpoints de lecture sont maintenant accessibles à tous les utilisateurs authentifiés (ADMIN + VENDEUR + CLIENT).
+
+### ✅ Nouvelles APIs de Recherche Sous-Catégories
+
+#### **Recherche avec informations de catégorie :**
+- `GET /api/sous-categories/with-categorie` - Toutes les sous-catégories avec infos catégorie
+- `GET /api/sous-categories/{id}/with-categorie` - Sous-catégorie individuelle avec infos catégorie  
+- `GET /api/sous-categories/search/nom/with-categorie?nom=xxx` - Recherche LIKE avec infos catégorie
+- `GET /api/sous-categories/search/with-categorie?keyword=xxx` - Recherche mot-clé avec infos catégorie
+
+#### **Recherche par ID catégorie :**
+- `GET /api/sous-categories/categorie/{categorieId}/with-categorie-info` - Par catégorie avec infos
+- `GET /api/sous-categories/categorie/{categorieId}/search/nom?nom=xxx` - Par catégorie + nom (LIKE)
+
+#### **Nouvelles APIs de Recherche Produit Combinée :**
+- `GET /api/produits/search/combined?boutiqueId=1&sousCategorieId=2&nom=chemise` - Recherche flexible (paramètres optionnels)
+- `GET /api/produits/search/boutique-souscategorie-nom?boutiqueId=1&sousCategorieId=2&nom=chemise` - Recherche stricte (tous obligatoires)
+
+#### **Structure DTO améliorée :**
+```json
+{
+  "id": 1,
+  "categorieId": 1,
+  "nom": "Chemises",
+  "description": "Chemises formelles",
+  "createdAt": "2026-04-26T18:40:47",
+  "categorieNom": "Vêtements Hommes",
+  "categorieDescription": "Collection complète"
+}
+```
+
+---
+
 ## Table des Matières
 - [Configuration](#configuration)
 - [User Management APIs](#user-management-apis)
@@ -658,6 +697,98 @@ ou
 false
 ```
 
+#### Récupérer les boutiques du vendeur connecté
+```http
+GET /api/boutiques/mes-boutiques
+Authorization: Bearer <token_jwt>
+```
+
+**Description:**
+- Retourne la liste des boutiques du vendeur actuellement authentifié
+- Nécessite le rôle `VENDEUR`
+- Utilise des DTOs pour éviter les `LazyInitializationException`
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Boutiques du vendeur récupérées avec succès",
+  "data": [
+    {
+      "id": 1,
+      "nom": "Boutique Mode Paris",
+      "description": "Boutique de vêtements tendance",
+      "vendeurId": 2,
+      "addresse": "Paris, France",
+      "logo": "/uploads/produit/boutique-logo.jpg",
+      "statut": "VALIDE",
+      "note": 4.5,
+      "createdAt": "2026-04-26T19:00:00Z"
+    }
+  ]
+}
+```
+
+**Erreurs possibles:**
+- `401 Unauthorized` - Utilisateur non authentifié
+- `403 Forbidden` - Utilisateur n'a pas le rôle VENDEUR
+- `500 Internal Server Error` - Erreur technique
+
+---
+
+#### Récupérer la boutique unique du vendeur connecté
+```http
+GET /api/boutiques/ma-boutique
+Authorization: Bearer <token_jwt>
+```
+
+**Description:**
+- Retourne directement la boutique unique du vendeur connecté (1 vendeur = 1 boutique)
+- Optimisée pour le cas d'usage où chaque vendeur n'a qu'une seule boutique
+- Nécessite le rôle `VENDEUR`
+- Utilise des DTOs pour éviter les `LazyInitializationException`
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Boutique du vendeur récupérée avec succès",
+  "data": {
+    "id": 1,
+    "nom": "Boutique Mode Paris",
+    "description": "Boutique de vêtements tendance",
+    "vendeurId": 2,
+    "addresse": "Paris, France",
+    "logo": "/uploads/produit/boutique-logo.jpg",
+    "statut": "VALIDE",
+    "note": 4.5,
+    "createdAt": "2026-04-26T19:00:00Z"
+  }
+}
+```
+
+**Response (404 Not Found) si le vendeur n'a pas de boutique:**
+```json
+{
+  "success": false,
+  "message": "Aucune boutique trouvée pour ce vendeur",
+  "data": null
+}
+```
+
+**Erreurs possibles:**
+- `401 Unauthorized` - Utilisateur non authentifié
+- `403 Forbidden` - Utilisateur n'a pas le rôle VENDEUR
+- `404 Not Found` - Le vendeur n'a pas de boutique
+- `500 Internal Server Error` - Erreur technique
+
+**Cas d'usage recommandé:**
+- Application mobile vendeur où chaque vendeur gère une seule boutique
+- Dashboard vendeur pour afficher rapidement les informations de sa boutique
+- Plus simple que `/mes-boutiques` car retourne directement l'objet boutique (pas de tableau)
+
+---
+
 #### Rechercher des boutiques
 ```http
 GET /api/boutiques/search?keyword=vêtements
@@ -684,7 +815,8 @@ Content-Type: application/json
 {
   "personneId": 1,
   "type": "CARTE_IDENTITE",
-  "url": "https://example.com/carte-id.pdf"
+  "url": "/uploads/documents/carte-id.jpg",
+  "validated": false
 }
 ```
 
@@ -695,7 +827,7 @@ Content-Type: multipart/form-data
 
 personneId: 1
 type: "CARTE_IDENTITE"
-file: [fichier document]
+file: [fichier image à stocker en local]
 ```
 
 #### Mettre à jour le fichier d'un document
@@ -703,7 +835,7 @@ file: [fichier document]
 POST /api/documents/{id}/file
 Content-Type: multipart/form-data
 
-file: [fichier document]
+file: [fichier image à stocker en local]
 ```
 
 **Response (201 Created):**
@@ -712,7 +844,7 @@ file: [fichier document]
   "id": 1,
   "personneId": 1,
   "type": "CARTE_IDENTITE",
-  "url": "https://example.com/carte-id.pdf",
+  "url": "/uploads/documents/carte-id.jpg",
   "validated": false,
   "createdAt": "2026-04-13T01:50:00"
 }
@@ -723,6 +855,21 @@ file: [fichier document]
 - `NINEA`
 - `PASSPORT`
 - `RCCM`
+
+**Note :** Les documents sont des fichiers images (JPG, PNG, etc.) stockés en local.
+
+#### Mettre à jour un document
+```http
+PUT /api/documents/1
+Content-Type: application/json
+
+{
+  "personneId": 1,
+  "type": "CARTE_IDENTITE",
+  "url": "/uploads/documents/carte-id-updated.jpg",
+  "validated": true
+}
+```
 
 #### Valider un document
 ```http
@@ -749,12 +896,17 @@ Le module de gestion des catégories utilise Spring Security avec des autorisati
 
 #### Endpoints Sécurisés
 
-**ADMIN uniquement :**
-- **Catégories** : Tous les endpoints `/api/categories/**`
-- **Sous-Catégories** : Tous les endpoints `/api/sous-categories/**`
+**Lecture (GET) - Accès public pour tous les utilisateurs authentifiés :**
+- **Catégories** : `GET /api/categories`, `GET /api/categories/with-sous-categories`
+- **Sous-Catégories** : `GET /api/sous-categories`, `GET /api/sous-categories/categorie/{id}`, `GET /api/sous-categories/categorie/{id}/with-produits`
+
+**Écriture (POST, PUT, DELETE) - ADMIN uniquement :**
+- **Catégories** : `POST /api/categories`, `PUT /api/categories/{id}`, `DELETE /api/categories/{id}`
+- **Sous-Catégories** : `POST /api/sous-categories`, `PUT /api/sous-categories/{id}`, `DELETE /api/sous-categories/{id}`
 
 #### Authentification Requise
-Tous les endpoints de catégories et sous-catégories nécessitent une authentification JWT valide avec le rôle ADMIN.
+- **Lecture** : Authentification JWT requise (ADMIN, VENDEUR, CLIENT)
+- **Écriture** : Authentification JWT avec rôle ADMIN requise
 
 ### Catégorie APIs
 
@@ -979,7 +1131,112 @@ Content-Type: application/json
 #### Lister les sous-catégories
 ```http
 GET /api/sous-categories
-GET /api/sous-categories/categorie/1
+Authorization: Bearer <token_jwt>
+```
+
+#### Lister les sous-catégories avec informations de catégorie
+```http
+GET /api/sous-categories/with-categorie
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "categorieId": 1,
+    "nom": "Chemises",
+    "description": "Chemises formelles et décontractées pour hommes",
+    "createdAt": "2026-04-26T18:40:47",
+    "categorieNom": "Vêtements Hommes",
+    "categorieDescription": "Collection complète de vêtements pour hommes"
+  }
+]
+```
+
+#### Rechercher des sous-catégories par ID catégorie avec informations
+```http
+GET /api/sous-categories/categorie/{categorieId}/with-categorie-info
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "categorieId": 1,
+    "nom": "Chemises",
+    "description": "Chemises formelles et décontractées pour hommes",
+    "createdAt": "2026-04-26T18:40:47",
+    "categorieNom": "Vêtements Hommes",
+    "categorieDescription": "Collection complète de vêtements pour hommes"
+  }
+]
+```
+
+#### Rechercher des sous-catégories par catégorie et nom (LIKE)
+```http
+GET /api/sous-categories/categorie/{categorieId}/search/nom?nom=chem
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "categorieId": 1,
+    "nom": "Chemises",
+    "description": "Chemises formelles et décontractées pour hommes",
+    "createdAt": "2026-04-26T18:40:47",
+    "categorieNom": "Vêtements Hommes",
+    "categorieDescription": "Collection complète de vêtements pour hommes"
+  }
+]
+```
+
+#### Rechercher des sous-catégories par nom avec informations de catégorie
+```http
+GET /api/sous-categories/search/nom/with-categorie?nom=chemise
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "categorieId": 1,
+    "nom": "Chemises",
+    "description": "Chemises formelles et décontractées pour hommes",
+    "createdAt": "2026-04-26T18:40:47",
+    "categorieNom": "Vêtements Hommes",
+    "categorieDescription": "Collection complète de vêtements pour hommes"
+  }
+]
+```
+
+#### Rechercher des sous-catégories par mot-clé avec informations de catégorie
+```http
+GET /api/sous-categories/search/with-categorie?keyword=chemise
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "categorieId": 1,
+    "nom": "Chemises",
+    "description": "Chemises formelles et décontractées pour hommes",
+    "createdAt": "2026-04-26T18:40:47",
+    "categorieNom": "Vêtements Hommes",
+    "categorieDescription": "Collection complète de vêtements pour hommes"
+  }
+]
 ```
 
 #### Modifier une sous-catégorie
@@ -1081,11 +1338,13 @@ image: [fichier image]
   "sousCategorieId": 1,
   "nom": "Chemise en coton",
   "description": "Chemise confortable en coton bio",
-  "image": "https://example.com/chemise.jpg",
+  "image": "/uploads/produit/3ac357ed-9e9e-4e4f-b633-b3ac6ec5ea60.jpeg",
   "statut": "ACTIF",
-  "createdAt": "2026-04-13T01:50:00"
+  "createdAt": "2026-04-26T22:26:50"
 }
 ```
+
+**Note :** Les images des produits sont des fichiers images (JPG, PNG, etc.) stockés en local dans le dossier `/uploads/produit/`.
 
 #### Lister les produits avec articles
 ```http
@@ -1098,6 +1357,62 @@ GET /api/produits/boutique/1
 GET /api/produits/sous-categorie/1
 GET /api/produits/statut/ACTIF
 GET /api/produits/search?keyword=chemise
+```
+
+#### Rechercher des produits par critères combinés
+```http
+GET /api/produits/search/combined?boutiqueId=1&sousCategorieId=2&nom=chemise
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "boutiqueId": 1,
+    "sousCategorieId": 2,
+    "nom": "Chemise en coton",
+    "description": "Chemise confortable en coton bio",
+    "image": "https://example.com/chemise.jpg",
+    "statut": "ACTIF",
+    "createdAt": "2026-04-26T18:46:39"
+  }
+]
+```
+
+#### Rechercher produits par boutique + sous-catégorie + nom (tous obligatoires)
+```http
+GET /api/produits/search/boutique-souscategorie-nom?boutiqueId=1&sousCategorieId=2&nom=chemise
+Authorization: Bearer <token_jwt>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "boutiqueId": 1,
+    "sousCategorieId": 2,
+    "nom": "Chemise en coton",
+    "description": "Chemise confortable en coton bio",
+    "image": "https://example.com/chemise.jpg",
+    "statut": "ACTIF",
+    "createdAt": "2026-04-26T18:46:39"
+  }
+]
+```
+
+**Exemples d'utilisation :**
+```http
+# Recherche flexible (paramètres optionnels)
+GET /api/produits/search/combined?boutiqueId=1&nom=chemise
+GET /api/produits/search/combined?sousCategorieId=2&nom=chemise
+GET /api/produits/search/combined?boutiqueId=1&sousCategorieId=2
+GET /api/produits/search/combined?nom=chemise
+
+# Recherche stricte (tous obligatoires)
+GET /api/produits/search/boutique-souscategorie-nom?boutiqueId=1&sousCategorieId=2&nom=chemise
 ```
 
 #### Activer/Désactiver un produit

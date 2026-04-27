@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,4 +16,5 @@ public class CategorieDTO {
     private String description;
     private String image;
     private LocalDateTime createdAt;
+    private List<SousCategorieDTO> sousCategories;
 }

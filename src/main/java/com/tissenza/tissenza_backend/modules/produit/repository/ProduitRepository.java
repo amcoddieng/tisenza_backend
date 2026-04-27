@@ -41,4 +41,20 @@ public interface ProduitRepository extends JpaRepository<Produit, Long> {
 
     @Query("SELECT p FROM Produit p LEFT JOIN FETCH p.articles WHERE p.id = :id")
     Optional<Produit> findByIdWithArticles(@Param("id") Long id);
+
+    @Query("SELECT p FROM Produit p WHERE " +
+           "(:boutiqueId IS NULL OR p.boutique.id = :boutiqueId) AND " +
+           "(:sousCategorieId IS NULL OR p.sousCategorie.id = :sousCategorieId) AND " +
+           "(:nom IS NULL OR p.nom LIKE %:nom%)")
+    List<Produit> searchByMultipleCriteria(@Param("boutiqueId") Long boutiqueId, 
+                                         @Param("sousCategorieId") Long sousCategorieId, 
+                                         @Param("nom") String nom);
+
+    @Query("SELECT p FROM Produit p WHERE " +
+           "p.boutique.id = :boutiqueId AND " +
+           "p.sousCategorie.id = :sousCategorieId AND " +
+           "p.nom LIKE %:nom%")
+    List<Produit> searchByBoutiqueSousCategorieAndNom(@Param("boutiqueId") Long boutiqueId, 
+                                                   @Param("sousCategorieId") Long sousCategorieId, 
+                                                   @Param("nom") String nom);
 }

@@ -1,9 +1,9 @@
 package com.tissenza.tissenza_backend.modules.boutique.controller;
 
+import com.tissenza.tissenza_backend.modules.boutique.dto.DocumentDTO;
 import com.tissenza.tissenza_backend.modules.boutique.entity.Document;
 import com.tissenza.tissenza_backend.modules.boutique.service.DocumentService;
-import com.tissenza.tissenza_backend.modules.user.entity.Personne;
-import com.tissenza.tissenza_backend.service.CloudinaryService;
+import com.tissenza.tissenza_backend.service.LocalStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,12 +25,12 @@ import java.util.List;
 public class DocumentController {
 
     private final DocumentService documentService;
-    private final CloudinaryService cloudinaryService;
+    private final LocalStorageService localStorageService;
 
     @PostMapping
     @Operation(summary = "Créer un nouveau document", description = "Crée un nouveau document dans le système")
-    public ResponseEntity<Document> createDocument(@RequestBody Document document) {
-        Document createdDocument = documentService.createDocument(document);
+    public ResponseEntity<DocumentDTO> createDocument(@RequestBody DocumentDTO documentDTO) {
+        DocumentDTO createdDocument = documentService.createDocumentDTO(documentDTO);
         return new ResponseEntity<>(createdDocument, HttpStatus.CREATED);
     }
 
@@ -38,30 +38,25 @@ public class DocumentController {
      * Créer un document avec upload de fichier
      */
     @PostMapping("/with-file")
-    @Operation(summary = "Créer un document avec fichier", description = "Crée un nouveau document avec upload de fichier sur Cloudinary")
-    public ResponseEntity<Document> createDocumentWithFile(
+    @Operation(summary = "Créer un document avec fichier", description = "Crée un nouveau document avec stockage de fichier en local")
+    public ResponseEntity<DocumentDTO> createDocumentWithFile(
             @RequestParam("personneId") Long personneId,
             @RequestParam("type") String type,
             @RequestParam("file") MultipartFile file) {
         
         try {
-            // Upload le fichier sur Cloudinary
-            String fileUrl = cloudinaryService.uploadImage(file);
-            log.info("Fichier uploadé: {}", fileUrl);
+            // Stocker le fichier en local
+            String fileUrl = localStorageService.storeFile(file, LocalStorageService.FileType.IMG_DOC);
+            log.info("Fichier stocké en local: {}", fileUrl);
             
-            // Créer le document avec l'URL du fichier
-            Document document = new Document();
+            // Créer le DTO du document avec l'URL du fichier
+            DocumentDTO documentDTO = new DocumentDTO();
+            documentDTO.setPersonneId(personneId);
+            documentDTO.setType(com.tissenza.tissenza_backend.modules.boutique.entity.Document.Type.valueOf(type));
+            documentDTO.setUrl(fileUrl);
+            documentDTO.setValidated(false);
             
-            // Créer l'objet de relation avec la personne
-            Personne personne = new Personne();
-            personne.setId(personneId);
-            document.setPersonne(personne);
-            
-            document.setType(Document.Type.valueOf(type));
-            document.setUrl(fileUrl);
-            document.setValidated(false);
-            
-            Document createdDocument = documentService.createDocument(document);
+            DocumentDTO createdDocument = documentService.createDocumentDTO(documentDTO);
             return new ResponseEntity<>(createdDocument, HttpStatus.CREATED);
             
         } catch (IOException e) {
@@ -75,27 +70,27 @@ public class DocumentController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Récupérer un document par ID", description = "Retourne les détails d'un document spécifique")
-    public ResponseEntity<Document> getDocumentById(
+    public ResponseEntity<DocumentDTO> getDocumentById(
             @Parameter(description = "ID du document à récupérer") @PathVariable Long id) {
-        return documentService.getDocumentById(id)
+        return documentService.getDocumentByIdDTO(id)
                 .map(document -> ResponseEntity.ok(document))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
     @Operation(summary = "Récupérer tous les documents", description = "Retourne la liste de tous les documents")
-    public ResponseEntity<List<Document>> getAllDocuments() {
-        List<Document> documents = documentService.getAllDocuments();
+    public ResponseEntity<List<DocumentDTO>> getAllDocuments() {
+        List<DocumentDTO> documents = documentService.getAllDocumentsDTO();
         return ResponseEntity.ok(documents);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Mettre à jour un document", description = "Met à jour les informations d'un document existant")
-    public ResponseEntity<Document> updateDocument(
+    public ResponseEntity<DocumentDTO> updateDocument(
             @Parameter(description = "ID du document à mettre à jour") @PathVariable Long id,
-            @RequestBody Document documentDetails) {
+            @RequestBody DocumentDTO documentDTO) {
         try {
-            Document updatedDocument = documentService.updateDocument(id, documentDetails);
+            DocumentDTO updatedDocument = documentService.updateDocumentDTO(id, documentDTO);
             return ResponseEntity.ok(updatedDocument);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -106,15 +101,15 @@ public class DocumentController {
      * Mettre à jour le fichier d'un document
      */
     @PostMapping("/{id}/file")
-    @Operation(summary = "Mettre à jour le fichier", description = "Upload et met à jour le fichier d'un document existant")
+    @Operation(summary = "Mettre à jour le fichier", description = "Stocke et met à jour le fichier d'un document existant en local")
     public ResponseEntity<Document> updateFile(
             @Parameter(description = "ID du document") @PathVariable Long id,
             @RequestParam("file") MultipartFile file) {
         
         try {
-            // Upload le fichier sur Cloudinary
-            String fileUrl = cloudinaryService.uploadImage(file);
-            log.info("Fichier uploadé: {}", fileUrl);
+            // Stocker le fichier en local
+            String fileUrl = localStorageService.storeFile(file, LocalStorageService.FileType.IMG_DOC);
+            log.info("Fichier stocké en local: {}", fileUrl);
             
             // Mettre à jour le document avec la nouvelle URL
             Document documentDetails = new Document();
@@ -142,35 +137,35 @@ public class DocumentController {
 
     @GetMapping("/personne/{personneId}")
     @Operation(summary = "Récupérer les documents d'une personne", description = "Retourne la liste des documents par ID personne")
-    public ResponseEntity<List<Document>> getDocumentsByPersonneId(
+    public ResponseEntity<List<DocumentDTO>> getDocumentsByPersonneId(
             @Parameter(description = "ID de la personne") @PathVariable Long personneId) {
-        List<Document> documents = documentService.getDocumentsByPersonneId(personneId);
+        List<DocumentDTO> documents = documentService.getDocumentsByPersonneIdDTO(personneId);
         return ResponseEntity.ok(documents);
     }
 
     @GetMapping("/personne/{personneId}/type/{type}")
     @Operation(summary = "Récupérer un document par personne et type", description = "Retourne un document spécifique par personne et type")
-    public ResponseEntity<Document> getDocumentByPersonneIdAndType(
+    public ResponseEntity<DocumentDTO> getDocumentByPersonneIdAndType(
             @Parameter(description = "ID de la personne") @PathVariable Long personneId,
             @Parameter(description = "Type de document") @PathVariable Document.Type type) {
-        return documentService.getDocumentByPersonneIdAndType(personneId, type)
+        return documentService.getDocumentByPersonneIdAndTypeDTO(personneId, type)
                 .map(document -> ResponseEntity.ok(document))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/type/{type}")
     @Operation(summary = "Récupérer des documents par type", description = "Retourne la liste des documents par type")
-    public ResponseEntity<List<Document>> getDocumentsByType(
+    public ResponseEntity<List<DocumentDTO>> getDocumentsByType(
             @Parameter(description = "Type de document") @PathVariable Document.Type type) {
-        List<Document> documents = documentService.getDocumentsByType(type);
+        List<DocumentDTO> documents = documentService.getDocumentsByTypeDTO(type);
         return ResponseEntity.ok(documents);
     }
 
     @GetMapping("/validated/{validated}")
     @Operation(summary = "Récupérer des documents par validation", description = "Retourne la liste des documents par statut de validation")
-    public ResponseEntity<List<Document>> getDocumentsByValidation(
+    public ResponseEntity<List<DocumentDTO>> getDocumentsByValidation(
             @Parameter(description = "Statut de validation") @PathVariable Boolean validated) {
-        List<Document> documents = documentService.getDocumentsByValidation(validated);
+        List<DocumentDTO> documents = documentService.getDocumentsByValidationDTO(validated);
         return ResponseEntity.ok(documents);
     }
 
@@ -188,9 +183,9 @@ public class DocumentController {
 
     @GetMapping("/search")
     @Operation(summary = "Recherche par mot-clé", description = "Recherche des documents par mot-clé dans l'URL")
-    public ResponseEntity<List<Document>> searchDocumentsByKeyword(
+    public ResponseEntity<List<DocumentDTO>> searchDocumentsByKeyword(
             @Parameter(description = "Mot-clé de recherche") @RequestParam String keyword) {
-        List<Document> documents = documentService.searchDocumentsByKeyword(keyword);
+        List<DocumentDTO> documents = documentService.searchDocumentsByKeywordDTO(keyword);
         return ResponseEntity.ok(documents);
     }
 
@@ -235,10 +230,10 @@ public class DocumentController {
 
     @PutMapping("/{id}/validate")
     @Operation(summary = "Valider un document", description = "Marque un document comme validé")
-    public ResponseEntity<Document> validateDocument(
+    public ResponseEntity<DocumentDTO> validateDocument(
             @Parameter(description = "ID du document à valider") @PathVariable Long id) {
         try {
-            Document validatedDocument = documentService.validateDocument(id);
+            DocumentDTO validatedDocument = documentService.validateDocumentDTO(id);
             return ResponseEntity.ok(validatedDocument);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -247,10 +242,10 @@ public class DocumentController {
 
     @PutMapping("/{id}/reject")
     @Operation(summary = "Rejeter un document", description = "Marque un document comme non validé")
-    public ResponseEntity<Document> rejectDocument(
+    public ResponseEntity<DocumentDTO> rejectDocument(
             @Parameter(description = "ID du document à rejeter") @PathVariable Long id) {
         try {
-            Document rejectedDocument = documentService.rejectDocument(id);
+            DocumentDTO rejectedDocument = documentService.rejectDocumentDTO(id);
             return ResponseEntity.ok(rejectedDocument);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -259,11 +254,11 @@ public class DocumentController {
 
     @PutMapping("/{id}/url")
     @Operation(summary = "Mettre à jour l'URL", description = "Met à jour l'URL d'un document")
-    public ResponseEntity<Document> updateDocumentUrl(
+    public ResponseEntity<DocumentDTO> updateDocumentUrl(
             @Parameter(description = "ID du document") @PathVariable Long id,
             @Parameter(description = "Nouvelle URL") @RequestParam String url) {
         try {
-            Document updatedDocument = documentService.updateDocumentUrl(id, url);
+            DocumentDTO updatedDocument = documentService.updateDocumentUrlDTO(id, url);
             return ResponseEntity.ok(updatedDocument);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

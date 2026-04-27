@@ -2,12 +2,18 @@ package com.tissenza.tissenza_backend.config;
 
 import com.tissenza.tissenza_backend.modules.produit.entity.Categorie;
 import com.tissenza.tissenza_backend.modules.produit.entity.SousCategorie;
+import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
+import com.tissenza.tissenza_backend.modules.produit.entity.Article;
 import com.tissenza.tissenza_backend.modules.produit.repository.CategorieRepository;
 import com.tissenza.tissenza_backend.modules.produit.repository.SousCategorieRepository;
+import com.tissenza.tissenza_backend.modules.produit.repository.ProduitRepository;
+import com.tissenza.tissenza_backend.modules.produit.repository.ArticleRepository;
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
 import com.tissenza.tissenza_backend.modules.user.entity.Personne;
 import com.tissenza.tissenza_backend.modules.user.repository.CompteRepository;
 import com.tissenza.tissenza_backend.modules.user.repository.PersonneRepository;
+import com.tissenza.tissenza_backend.modules.boutique.entity.Boutique;
+import com.tissenza.tissenza_backend.modules.boutique.repository.BoutiqueRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -26,6 +32,9 @@ public class DataInitializer implements CommandLineRunner {
 
     private final CategorieRepository categorieRepository;
     private final SousCategorieRepository sousCategorieRepository;
+    private final ProduitRepository produitRepository;
+    private final ArticleRepository articleRepository;
+    private final BoutiqueRepository boutiqueRepository;
     private final PersonneRepository personneRepository;
     private final CompteRepository compteRepository;
     private final PasswordEncoder passwordEncoder;
@@ -35,6 +44,9 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         initializeUsers();
         initializeCategoriesAndSubCategories();
+        initializeBoutiquesForVendors();
+        initializeProductsForBoutiques();
+        initializeArticlesForProducts();
     }
 
     private void initializeUsers() {
@@ -228,4 +240,124 @@ public class DataInitializer implements CommandLineRunner {
         sousCategorie.setCreatedAt(LocalDateTime.now());
         return sousCategorie;
     }
+
+    private void initializeBoutiquesForVendors() {
+        log.info("Initialisation des boutiques pour chaque vendeur...");
+
+        // Vérifier si les boutiques existent déjà
+        if (boutiqueRepository.count() > 0) {
+            log.info("Les boutiques existent déjà, initialisation ignorée.");
+            return;
+        }
+
+        // Récupérer tous les vendeurs
+        List<Compte> vendeurs = compteRepository.findByRole(Compte.Role.VENDEUR);
+        
+        for (Compte vendeur : vendeurs) {
+            Boutique boutique = createBoutiqueForVendor(vendeur);
+            boutiqueRepository.save(boutique);
+            log.info("Boutique créée pour le vendeur: {}", vendeur.getEmail());
+        }
+    }
+
+    private Boutique createBoutiqueForVendor(Compte vendeur) {
+        Boutique boutique = new Boutique();
+        boutique.setVendeur(vendeur); // Le vendeur est de type Compte, pas Personne
+        boutique.setNom("Boutique de " + vendeur.getPersonne().getNom());
+        boutique.setDescription("Boutique spécialisée pour " + vendeur.getPersonne().getNom());
+        boutique.setAddresse("Adresse par défaut, Dakar");
+        boutique.setStatut(Boutique.Statut.VALIDE); // Valider automatiquement pour les tests
+        boutique.setCreatedAt(LocalDateTime.now());
+        return boutique;
+    }
+
+    private void initializeProductsForBoutiques() {
+        log.info("Initialisation des produits pour chaque boutique...");
+
+        // Vérifier si les produits existent déjà
+        if (produitRepository.count() > 0) {
+            log.info("Les produits existent déjà, initialisation ignorée.");
+            return;
+        }
+
+        // Récupérer toutes les boutiques et sous-catégories
+        List<Boutique> boutiques = boutiqueRepository.findAll();
+        List<SousCategorie> sousCategories = sousCategorieRepository.findAll();
+
+        for (Boutique boutique : boutiques) {
+            // Créer 3-5 produits par boutique
+            int productsCount = 3 + (int)(Math.random() * 3); // 3 à 5 produits
+            
+            for (int i = 0; i < productsCount; i++) {
+                SousCategorie randomSousCategorie = sousCategories.get((int)(Math.random() * sousCategories.size()));
+                Produit produit = createProductForBoutique(boutique, randomSousCategorie, i);
+                produitRepository.save(produit);
+            }
+            
+            log.info("Produits créés pour la boutique: {}", boutique.getNom());
+        }
+    }
+
+    private Produit createProductForBoutique(Boutique boutique, SousCategorie sousCategorie, int index) {
+        Produit produit = new Produit();
+        produit.setBoutique(boutique);
+        produit.setSousCategorie(sousCategorie);
+        produit.setNom("Produit " + (index + 1) + " - " + sousCategorie.getNom());
+        produit.setDescription("Description du produit " + (index + 1) + " pour " + boutique.getNom());
+        produit.setImage("https://example.com/product" + (index + 1) + ".jpg");
+        produit.setStatut(Produit.Statut.ACTIF);
+        produit.setCreatedAt(LocalDateTime.now());
+        return produit;
+    }
+
+    private void initializeArticlesForProducts() {
+        log.info("Initialisation des articles pour chaque produit...");
+
+        // Vérifier si les articles existent déjà
+        if (articleRepository.count() > 0) {
+            log.info("Les articles existent déjà, initialisation ignorée.");
+            return;
+        }
+
+        // Récupérer tous les produits
+        List<Produit> produits = produitRepository.findAll();
+
+        for (Produit produit : produits) {
+            // Créer 2-4 articles par produit (différentes tailles/couleurs)
+            int articlesCount = 2 + (int)(Math.random() * 3); // 2 à 4 articles
+            
+            for (int i = 0; i < articlesCount; i++) {
+                Article article = createArticleForProduct(produit, i);
+                articleRepository.save(article);
+            }
+            
+            log.info("Articles créés pour le produit: {}", produit.getNom());
+        }
+    }
+
+    private Article createArticleForProduct(Produit produit, int index) {
+        Article article = new Article();
+        article.setProduit(produit);
+        article.setSku("SKU-" + produit.getId() + "-" + (index + 1));
+        article.setPrix(java.math.BigDecimal.valueOf(1000.0 + (Math.random() * 50000.0))); // Prix entre 1000 et 51000
+        article.setStockActuel(10 + (int)(Math.random() * 90)); // 10 à 100 unités
+        
+        // Créer des attributs JSON valides avec taille et couleur
+        String attributsJson = String.format("{\"taille\":\"%s\",\"couleur\":\"%s\"}", getRandomTaille(), getRandomCouleur());
+        article.setAttributs(attributsJson);
+        
+        article.setImage("https://example.com/article" + (index + 1) + ".jpg");
+        return article;
+    }
+
+    private String getRandomTaille() {
+        String[] tailles = {"S", "M", "L", "XL", "XXL"};
+        return tailles[(int)(Math.random() * tailles.length)];
+    }
+
+    private String getRandomCouleur() {
+        String[] couleurs = {"Rouge", "Bleu", "Vert", "Noir", "Blanc", "Gris", "Jaune"};
+        return couleurs[(int)(Math.random() * couleurs.length)];
+    }
+
 }

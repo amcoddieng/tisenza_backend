@@ -26,4 +26,6 @@ public interface SousCategorieRepository extends JpaRepository<SousCategorie, Lo
 
     @Query("SELECT sc FROM SousCategorie sc LEFT JOIN FETCH sc.produits WHERE sc.categorie.id = :categorieId")
     List<SousCategorie> findByCategorieIdWithProduits(@Param("categorieId") Long categorieId);
+
+    List<SousCategorie> findByCategorieIdAndNomContainingIgnoreCase(Long categorieId, String nom);
 }

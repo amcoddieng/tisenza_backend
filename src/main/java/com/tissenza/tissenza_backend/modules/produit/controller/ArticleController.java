@@ -1,9 +1,11 @@
 package com.tissenza.tissenza_backend.modules.produit.controller;
 
+import com.tissenza.tissenza_backend.modules.produit.dto.ArticleDTO;
 import com.tissenza.tissenza_backend.modules.produit.entity.Article;
 import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
 import com.tissenza.tissenza_backend.modules.produit.service.ArticleService;
 import com.tissenza.tissenza_backend.service.CloudinaryService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,9 +31,10 @@ public class ArticleController {
     private final CloudinaryService cloudinaryService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'VENDEUR')")
     @Operation(summary = "Créer un nouvel article", description = "Crée un nouvel article dans le système")
-    public ResponseEntity<Article> createArticle(@RequestBody Article article) {
-        Article createdArticle = articleService.createArticle(article);
+    public ResponseEntity<ArticleDTO> createArticle(@RequestBody Article article) {
+        ArticleDTO createdArticle = articleService.createArticleDTO(article);
         return new ResponseEntity<>(createdArticle, HttpStatus.CREATED);
     }
 
@@ -40,7 +43,7 @@ public class ArticleController {
      */
     @PostMapping("/with-image")
     @Operation(summary = "Créer un article avec image", description = "Crée un nouvel article avec upload d'image sur Cloudinary")
-    public ResponseEntity<Article> createArticleWithImage(
+    public ResponseEntity<ArticleDTO> createArticleWithImage(
             @RequestParam("produitId") Long produitId,
             @RequestParam("sku") String sku,
             @RequestParam("prix") BigDecimal prix,
@@ -70,7 +73,7 @@ public class ArticleController {
             article.setAttributs(attributs);
             article.setImage(imageUrl);
             
-            Article createdArticle = articleService.createArticle(article);
+            ArticleDTO createdArticle = articleService.createArticleDTO(article);
             return new ResponseEntity<>(createdArticle, HttpStatus.CREATED);
             
         } catch (IOException e) {
@@ -83,28 +86,31 @@ public class ArticleController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Récupérer un article par ID", description = "Retourne les détails d'un article spécifique")
-    public ResponseEntity<Article> getArticleById(
+    public ResponseEntity<ArticleDTO> getArticleById(
             @Parameter(description = "ID de l'article à récupérer") @PathVariable Long id) {
-        return articleService.getArticleById(id)
+        return articleService.getArticleByIdDTO(id)
                 .map(article -> ResponseEntity.ok(article))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Récupérer tous les articles", description = "Retourne la liste de tous les articles")
-    public ResponseEntity<List<Article>> getAllArticles() {
-        List<Article> articles = articleService.getAllArticles();
+    public ResponseEntity<List<ArticleDTO>> getAllArticles() {
+        List<ArticleDTO> articles = articleService.getAllArticlesDTO();
         return ResponseEntity.ok(articles);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'VENDEUR')")
     @Operation(summary = "Mettre à jour un article", description = "Met à jour les informations d'un article existant")
-    public ResponseEntity<Article> updateArticle(
+    public ResponseEntity<ArticleDTO> updateArticle(
             @Parameter(description = "ID de l'article à mettre à jour") @PathVariable Long id,
             @RequestBody Article articleDetails) {
         try {
-            Article updatedArticle = articleService.updateArticle(id, articleDetails);
+            ArticleDTO updatedArticle = articleService.updateArticleDTO(id, articleDetails);
             return ResponseEntity.ok(updatedArticle);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -116,7 +122,7 @@ public class ArticleController {
      */
     @PostMapping("/{id}/image")
     @Operation(summary = "Mettre à jour l'image", description = "Upload et met à jour l'image d'un article existant")
-    public ResponseEntity<Article> updateImage(
+    public ResponseEntity<ArticleDTO> updateImage(
             @Parameter(description = "ID de l'article") @PathVariable Long id,
             @RequestParam("image") MultipartFile imageFile) {
         
@@ -129,7 +135,7 @@ public class ArticleController {
             Article articleDetails = new Article();
             articleDetails.setImage(imageUrl);
             
-            Article updatedArticle = articleService.updateArticle(id, articleDetails);
+            ArticleDTO updatedArticle = articleService.updateArticleDTO(id, articleDetails);
             return ResponseEntity.ok(updatedArticle);
             
         } catch (IOException e) {
@@ -150,59 +156,65 @@ public class ArticleController {
     }
 
     @GetMapping("/produit/{produitId}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Récupérer les articles d'un produit", description = "Retourne la liste des articles par ID produit")
-    public ResponseEntity<List<Article>> getArticlesByProduitId(
+    public ResponseEntity<List<ArticleDTO>> getArticlesByProduitId(
             @Parameter(description = "ID du produit") @PathVariable Long produitId) {
-        List<Article> articles = articleService.getArticlesByProduitId(produitId);
+        List<ArticleDTO> articles = articleService.getArticlesByProduitIdDTO(produitId);
         return ResponseEntity.ok(articles);
     }
 
     @GetMapping("/sku/{sku}")
     @Operation(summary = "Récupérer un article par SKU", description = "Retourne un article par son SKU")
-    public ResponseEntity<Article> getArticleBySku(
+    public ResponseEntity<ArticleDTO> getArticleBySku(
             @Parameter(description = "SKU de l'article") @PathVariable String sku) {
-        return articleService.getArticleBySku(sku)
+        return articleService.getArticleBySkuDTO(sku)
                 .map(article -> ResponseEntity.ok(article))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/stock/greater/{stock}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Récupérer les articles avec stock supérieur", description = "Retourne les articles avec un stock supérieur à la valeur donnée")
-    public ResponseEntity<List<Article>> getArticlesWithStockGreaterThan(
+    public ResponseEntity<List<ArticleDTO>> getArticlesWithStockGreaterThan(
             @Parameter(description = "Stock minimum") @PathVariable Integer stock) {
-        List<Article> articles = articleService.getArticlesWithStockGreaterThan(stock);
+        List<ArticleDTO> articles = articleService.getArticlesWithStockGreaterThanDTO(stock);
         return ResponseEntity.ok(articles);
     }
 
     @GetMapping("/stock/less/{stock}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Récupérer les articles avec stock inférieur", description = "Retourne les articles avec un stock inférieur à la valeur donnée")
-    public ResponseEntity<List<Article>> getArticlesWithStockLessThan(
+    public ResponseEntity<List<ArticleDTO>> getArticlesWithStockLessThan(
             @Parameter(description = "Stock maximum") @PathVariable Integer stock) {
-        List<Article> articles = articleService.getArticlesWithStockLessThan(stock);
+        List<ArticleDTO> articles = articleService.getArticlesWithStockLessThanDTO(stock);
         return ResponseEntity.ok(articles);
     }
 
     @GetMapping("/out-of-stock")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Récupérer les articles en rupture de stock", description = "Retourne la liste des articles avec stock à 0")
-    public ResponseEntity<List<Article>> getOutOfStockArticles() {
-        List<Article> articles = articleService.getOutOfStockArticles();
+    public ResponseEntity<List<ArticleDTO>> getOutOfStockArticles() {
+        List<ArticleDTO> articles = articleService.getOutOfStockArticlesDTO();
         return ResponseEntity.ok(articles);
     }
 
     @GetMapping("/price-range")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Récupérer les articles par plage de prix", description = "Retourne les articles dans une plage de prix")
-    public ResponseEntity<List<Article>> getArticlesByPriceRange(
+    public ResponseEntity<List<ArticleDTO>> getArticlesByPriceRange(
             @Parameter(description = "Prix minimum") @RequestParam BigDecimal min,
             @Parameter(description = "Prix maximum") @RequestParam BigDecimal max) {
-        List<Article> articles = articleService.getArticlesByPriceRange(min, max);
+        List<ArticleDTO> articles = articleService.getArticlesByPriceRangeDTO(min, max);
         return ResponseEntity.ok(articles);
     }
 
     @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Recherche par mot-clé", description = "Recherche des articles par mot-clé dans SKU ou attributs")
-    public ResponseEntity<List<Article>> searchArticlesByKeyword(
+    public ResponseEntity<List<ArticleDTO>> searchArticlesByKeyword(
             @Parameter(description = "Mot-clé de recherche") @RequestParam String keyword) {
-        List<Article> articles = articleService.searchArticlesByKeyword(keyword);
+        List<ArticleDTO> articles = articleService.searchArticlesByKeywordDTO(keyword);
         return ResponseEntity.ok(articles);
     }
 
@@ -270,11 +282,11 @@ public class ArticleController {
 
     @PutMapping("/{id}/stock")
     @Operation(summary = "Mettre à jour le stock", description = "Met à jour le stock d'un article")
-    public ResponseEntity<Article> updateStock(
+    public ResponseEntity<ArticleDTO> updateStock(
             @Parameter(description = "ID de l'article") @PathVariable Long id,
             @Parameter(description = "Nouveau stock") @RequestParam Integer newStock) {
         try {
-            Article updatedArticle = articleService.updateStock(id, newStock);
+            ArticleDTO updatedArticle = articleService.updateStockDTO(id, newStock);
             return ResponseEntity.ok(updatedArticle);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -283,12 +295,12 @@ public class ArticleController {
 
     @PutMapping("/{id}/stock/add")
     @Operation(summary = "Ajouter du stock", description = "Ajoute une quantité au stock d'un article")
-    public ResponseEntity<Article> addStock(
+    public ResponseEntity<ArticleDTO> addStock(
             @Parameter(description = "ID de l'article") @PathVariable Long id,
             @Parameter(description = "Quantité à ajouter") @RequestParam Integer quantity,
             @Parameter(description = "Motif du mouvement") @RequestParam(required = false) String motif) {
         try {
-            Article updatedArticle = articleService.addStock(id, quantity, motif);
+            ArticleDTO updatedArticle = articleService.addStockDTO(id, quantity, motif);
             return ResponseEntity.ok(updatedArticle);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -297,12 +309,12 @@ public class ArticleController {
 
     @PutMapping("/{id}/stock/remove")
     @Operation(summary = "Retirer du stock", description = "Retire une quantité du stock d'un article")
-    public ResponseEntity<Article> removeStock(
+    public ResponseEntity<ArticleDTO> removeStock(
             @Parameter(description = "ID de l'article") @PathVariable Long id,
             @Parameter(description = "Quantité à retirer") @RequestParam Integer quantity,
             @Parameter(description = "Motif du mouvement") @RequestParam(required = false) String motif) {
         try {
-            Article updatedArticle = articleService.removeStock(id, quantity, motif);
+            ArticleDTO updatedArticle = articleService.removeStockDTO(id, quantity, motif);
             return ResponseEntity.ok(updatedArticle);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();

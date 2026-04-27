@@ -1,5 +1,6 @@
 package com.tissenza.tissenza_backend.modules.produit.controller;
 
+import com.tissenza.tissenza_backend.modules.produit.dto.CategorieDTO;
 import com.tissenza.tissenza_backend.modules.produit.entity.Categorie;
 import com.tissenza.tissenza_backend.modules.produit.service.CategorieService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,28 +31,28 @@ public class CategorieController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Récupérer une catégorie par ID", description = "Retourne les détails d'une catégorie spécifique")
-    public ResponseEntity<Categorie> getCategorieById(
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Récupérer une catégorie par ID", description = "Retourne les détails d'une catégorie spécifique en DTO")
+    public ResponseEntity<CategorieDTO> getCategorieById(
             @Parameter(description = "ID de la catégorie à récupérer") @PathVariable Long id) {
-        return categorieService.getCategorieById(id)
+        return categorieService.getCategorieByIdDTO(id)
                 .map(categorie -> ResponseEntity.ok(categorie))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Récupérer toutes les catégories", description = "Retourne la liste de toutes les catégories")
-    public ResponseEntity<List<Categorie>> getAllCategories() {
-        List<Categorie> categories = categorieService.getAllCategories();
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Récupérer toutes les catégories", description = "Retourne la liste de toutes les catégories en DTO")
+    public ResponseEntity<List<CategorieDTO>> getAllCategories() {
+        List<CategorieDTO> categories = categorieService.getAllCategoriesDTO();
         return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/with-sous-categories")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Récupérer les catégories avec sous-catégories", description = "Retourne les catégories avec leurs sous-catégories chargées")
-    public ResponseEntity<List<Categorie>> getAllCategoriesWithSousCategories() {
-        List<Categorie> categories = categorieService.getAllCategoriesWithSousCategories();
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Récupérer les catégories avec sous-catégories", description = "Retourne les catégories avec leurs sous-catégories chargées en DTO")
+    public ResponseEntity<List<CategorieDTO>> getAllCategoriesWithSousCategories() {
+        List<CategorieDTO> categories = categorieService.getAllCategoriesWithSousCategoriesDTO();
         return ResponseEntity.ok(categories);
     }
 
@@ -79,30 +80,30 @@ public class CategorieController {
     }
 
     @GetMapping("/nom/{nom}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Récupérer une catégorie par nom", description = "Retourne une catégorie par son nom")
-    public ResponseEntity<Categorie> getCategorieByNom(
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Récupérer une catégorie par nom", description = "Retourne une catégorie par son nom en DTO")
+    public ResponseEntity<CategorieDTO> getCategorieByNom(
             @Parameter(description = "Nom de la catégorie") @PathVariable String nom) {
-        return categorieService.getCategorieByNom(nom)
+        return categorieService.getCategorieByNomDTO(nom)
                 .map(categorie -> ResponseEntity.ok(categorie))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/search/nom")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Rechercher par nom", description = "Recherche des catégories par nom (insensible à la casse)")
-    public ResponseEntity<List<Categorie>> searchCategoriesByNom(
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Rechercher par nom", description = "Recherche des catégories par nom (insensible à la casse) en DTO")
+    public ResponseEntity<List<CategorieDTO>> searchCategoriesByNom(
             @Parameter(description = "Nom à rechercher") @RequestParam String nom) {
-        List<Categorie> categories = categorieService.searchCategoriesByNom(nom);
+        List<CategorieDTO> categories = categorieService.searchCategoriesByNomDTO(nom);
         return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Recherche par mot-clé", description = "Recherche des catégories par mot-clé dans nom ou description")
-    public ResponseEntity<List<Categorie>> searchCategoriesByKeyword(
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Recherche par mot-clé", description = "Recherche des catégories par mot-clé dans nom ou description en DTO")
+    public ResponseEntity<List<CategorieDTO>> searchCategoriesByKeyword(
             @Parameter(description = "Mot-clé de recherche") @RequestParam String keyword) {
-        List<Categorie> categories = categorieService.searchCategoriesByKeyword(keyword);
+        List<CategorieDTO> categories = categorieService.searchCategoriesByKeywordDTO(keyword);
         return ResponseEntity.ok(categories);
     }
 
@@ -124,7 +125,7 @@ public class CategorieController {
     }
 
     @GetMapping("/exists/nom/{nom}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Vérifier l'existence par nom", description = "Vérifie si une catégorie existe par nom")
     public ResponseEntity<Boolean> existsByNom(
             @Parameter(description = "Nom de la catégorie à vérifier") @PathVariable String nom) {

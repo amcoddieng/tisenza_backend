@@ -12,11 +12,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/boutiques")
@@ -27,6 +31,7 @@ public class BoutiqueController {
 
     private final BoutiqueService boutiqueService;
     private final LocalStorageService localStorageService;
+    private final com.tissenza.tissenza_backend.modules.auth.service.AuthService authService;
 
     @PostMapping
     @Operation(summary = "Créer une nouvelle boutique", description = "Crée une nouvelle boutique dans le système")
@@ -273,6 +278,71 @@ public class BoutiqueController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("Boutique non trouvée"));
+        }
+    }
+
+    @GetMapping("/mes-boutiques")
+    @PreAuthorize("hasRole('VENDEUR')")
+    @Operation(summary = "Récupérer les boutiques du vendeur connecté", description = "Retourne la liste des boutiques du vendeur actuellement authentifié")
+    public ResponseEntity<ApiResponse<List<BoutiqueDTO>>> getMyBoutiques() {
+        try {
+            // Récupérer le compte du vendeur connecté
+            com.tissenza.tissenza_backend.modules.user.entity.Compte currentCompte = authService.getCurrentCompte();
+            
+            // Vérifier que l'utilisateur est bien un vendeur
+            if (currentCompte.getRole() != com.tissenza.tissenza_backend.modules.user.entity.Compte.Role.VENDEUR) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(ApiResponse.error("Accès réservé aux vendeurs"));
+            }
+
+            // Récupérer les boutiques du vendeur
+            List<BoutiqueDTO> boutiques = boutiqueService.getBoutiquesByVendeurIdDTO(currentCompte.getId());
+            
+            return ResponseEntity.ok(ApiResponse.success(boutiques, "Boutiques du vendeur récupérées avec succès"));
+            
+        } catch (com.tissenza.tissenza_backend.exception.BusinessException e) {
+            log.error("Erreur métier lors de la récupération des boutiques du vendeur: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Utilisateur non authentifié"));
+        } catch (Exception e) {
+            log.error("Erreur lors de la récupération des boutiques du vendeur: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Erreur lors de la récupération des boutiques"));
+        }
+    }
+
+    @GetMapping("/ma-boutique")
+    @PreAuthorize("hasRole('VENDEUR')")
+    @Operation(summary = "Récupérer la boutique unique du vendeur connecté", description = "Retourne la boutique du vendeur actuellement authentifié (1 vendeur = 1 boutique)")
+    public ResponseEntity<ApiResponse<BoutiqueDTO>> getMyBoutique() {
+        try {
+            // Récupérer le compte du vendeur connecté
+            com.tissenza.tissenza_backend.modules.user.entity.Compte currentCompte = authService.getCurrentCompte();
+            
+            // Vérifier que l'utilisateur est bien un vendeur
+            if (currentCompte.getRole() != com.tissenza.tissenza_backend.modules.user.entity.Compte.Role.VENDEUR) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(ApiResponse.error("Accès réservé aux vendeurs"));
+            }
+
+            // Récupérer la boutique unique du vendeur
+            Optional<BoutiqueDTO> boutique = boutiqueService.getBoutiqueByVendeurIdDTO(currentCompte.getId());
+            
+            if (boutique.isPresent()) {
+                return ResponseEntity.ok(ApiResponse.success(boutique.get(), "Boutique du vendeur récupérée avec succès"));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Aucune boutique trouvée pour ce vendeur"));
+            }
+            
+        } catch (com.tissenza.tissenza_backend.exception.BusinessException e) {
+            log.error("Erreur métier lors de la récupération de la boutique du vendeur: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Utilisateur non authentifié"));
+        } catch (Exception e) {
+            log.error("Erreur lors de la récupération de la boutique du vendeur: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Erreur lors de la récupération de la boutique"));
         }
     }
 }

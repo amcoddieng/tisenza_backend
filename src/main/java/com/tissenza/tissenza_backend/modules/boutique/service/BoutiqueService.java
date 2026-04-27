@@ -101,7 +101,29 @@ public class BoutiqueService {
     }
 
     public List<Boutique> getBoutiquesByVendeurId(Long vendeurId) {
-        return boutiqueRepository.findByVendeurId(vendeurId);
+        return boutiqueRepository.findAllByVendeurId(vendeurId);
+    }
+
+    /**
+     * Récupère les boutiques d'un vendeur sous forme de DTOs
+     * @param vendeurId l'ID du vendeur
+     * @return la liste des DTOs de boutiques
+     */
+    @Transactional(readOnly = true)
+    public List<BoutiqueDTO> getBoutiquesByVendeurIdDTO(Long vendeurId) {
+        List<Boutique> boutiques = boutiqueRepository.findAllByVendeurId(vendeurId);
+        return boutiqueMapper.toDTOList(boutiques);
+    }
+
+    /**
+     * Récupère la boutique unique d'un vendeur sous forme de DTO
+     * @param vendeurId l'ID du vendeur
+     * @return Optional contenant le DTO de la boutique ou vide si non trouvée
+     */
+    @Transactional(readOnly = true)
+    public Optional<BoutiqueDTO> getBoutiqueByVendeurIdDTO(Long vendeurId) {
+        return boutiqueRepository.findByVendeurId(vendeurId)
+                .map(boutiqueMapper::toDTO);
     }
 
     public List<Boutique> getBoutiquesByStatut(Boutique.Statut statut) {

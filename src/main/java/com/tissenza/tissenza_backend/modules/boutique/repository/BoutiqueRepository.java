@@ -15,7 +15,9 @@ public interface BoutiqueRepository extends JpaRepository<Boutique, Long> {
 
     Optional<Boutique> findByVendeur(Compte vendeur);
 
-    List<Boutique> findByVendeurId(Long vendeurId);
+    Optional<Boutique> findByVendeurId(Long vendeurId);
+
+    List<Boutique> findAllByVendeurId(Long vendeurId);
 
     List<Boutique> findByStatut(Boutique.Statut statut);
 

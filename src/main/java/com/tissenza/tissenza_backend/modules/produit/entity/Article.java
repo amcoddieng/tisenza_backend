@@ -1,9 +1,12 @@
 package com.tissenza.tissenza_backend.modules.produit.entity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,6 +36,7 @@ public class Article {
     private Integer stockActuel = 0;
 
     @Column(name = "attributs", columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String attributs;
 
     @Column(name = "image", columnDefinition = "TEXT")

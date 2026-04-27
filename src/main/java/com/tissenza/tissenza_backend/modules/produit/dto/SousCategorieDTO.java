@@ -15,4 +15,8 @@ public class SousCategorieDTO {
     private String nom;
     private String description;
     private LocalDateTime createdAt;
+    
+    // Informations de la catégorie concernée (optionnel)
+    private String categorieNom;
+    private String categorieDescription;
 }

@@ -29,7 +29,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Query("SELECT a FROM Article a WHERE a.prix BETWEEN :min AND :max")
     List<Article> findByPriceRange(@Param("min") BigDecimal min, @Param("max") BigDecimal max);
 
-    @Query("SELECT a FROM Article a WHERE a.sku LIKE %:keyword% OR a.attributs LIKE %:keyword%")
+    @Query("SELECT a FROM Article a WHERE a.sku LIKE %:keyword% OR CAST(a.attributs AS text) LIKE %:keyword%")
     List<Article> searchByKeyword(@Param("keyword") String keyword);
 
     @Query("SELECT COUNT(a) FROM Article a WHERE a.produit.id = :produitId")
