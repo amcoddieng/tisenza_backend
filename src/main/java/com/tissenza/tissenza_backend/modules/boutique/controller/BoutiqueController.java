@@ -129,11 +129,17 @@ public class BoutiqueController {
             String logoUrl = localStorageService.storeFile(logoFile, LocalStorageService.FileType.PRODUIT);
             log.info("Logo uploadé: {}", logoUrl);
             
-            // Mettre à jour la boutique avec la nouvelle URL
-            BoutiqueDTO boutiqueDetails = new BoutiqueDTO();
-            boutiqueDetails.setLogo(logoUrl);
+            // Récupérer la boutique existante et mettre à jour uniquement le logo
+            Optional<BoutiqueDTO> existingBoutiqueOpt = boutiqueService.getBoutiqueById(id);
+            if (existingBoutiqueOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Boutique non trouvée"));
+            }
             
-            BoutiqueDTO updatedBoutique = boutiqueService.updateBoutique(id, boutiqueDetails);
+            BoutiqueDTO existingBoutique = existingBoutiqueOpt.get();
+            
+            existingBoutique.setLogo(logoUrl);
+            BoutiqueDTO updatedBoutique = boutiqueService.updateBoutique(id, existingBoutique);
             return ResponseEntity.ok(ApiResponse.success(updatedBoutique, "Logo mis à jour avec succès"));
             
         } catch (IOException e) {

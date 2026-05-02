@@ -1,6 +1,9 @@
 package com.tissenza.tissenza_backend.modules.produit.controller;
 
 import com.tissenza.tissenza_backend.modules.produit.dto.ProduitDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ProduitWithArticlesDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ProduitWithArticlesRequest;
+import com.tissenza.tissenza_backend.modules.produit.dto.ArticleRequest;
 import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
 import com.tissenza.tissenza_backend.modules.produit.entity.SousCategorie;
 import com.tissenza.tissenza_backend.modules.produit.service.ProduitService;
@@ -283,6 +286,46 @@ public class ProduitController {
             return ResponseEntity.ok(deactivatedProduit);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * Créer un produit avec plusieurs articles en une seule transaction
+     */
+    @PostMapping("/with-articles")
+    @Operation(summary = "Créer un produit avec plusieurs articles", description = "Crée un nouveau produit et plusieurs articles en une seule transaction")
+    public ResponseEntity<ProduitWithArticlesDTO> createProduitWithArticles(
+            @RequestParam("boutiqueId") Long boutiqueId,
+            @RequestParam("sousCategorieId") Long sousCategorieId,
+            @RequestParam("nom") String nom,
+            @RequestParam("description") String description,
+            @RequestParam("statut") String statut,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile,
+            @RequestParam("articles") String articlesJson) {
+        
+        try {
+            log.info("Requête de création de produit avec image et articles");
+            
+            // Parser le JSON des articles
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            java.util.List<ArticleRequest> articles = mapper.readValue(articlesJson, 
+                mapper.getTypeFactory().constructCollectionType(java.util.List.class, ArticleRequest.class));
+            
+            // Créer la requête
+            ProduitWithArticlesRequest request = new ProduitWithArticlesRequest();
+            request.setBoutiqueId(boutiqueId);
+            request.setSousCategorieId(sousCategorieId);
+            request.setNom(nom);
+            request.setDescription(description);
+            request.setStatut(statut);
+            request.setArticles(articles);
+            
+            ProduitWithArticlesDTO createdProduit = produitService.createProduitWithArticles(request, imageFile);
+            return new ResponseEntity<>(createdProduit, HttpStatus.CREATED);
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de la création du produit avec articles: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

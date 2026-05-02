@@ -1,7 +1,10 @@
 package com.tissenza.tissenza_backend.modules.produit.mapper;
 
 import com.tissenza.tissenza_backend.modules.produit.dto.ProduitDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ProduitWithArticlesDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ArticleDTO;
 import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
+import com.tissenza.tissenza_backend.modules.produit.entity.Article;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -86,5 +89,63 @@ public class ProduitMapper {
         return dtos.stream()
                 .map(this::toEntity)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Convertit une entité Produit en ProduitWithArticlesDTO avec ses articles
+     */
+    public ProduitWithArticlesDTO toDTOWithArticles(Produit produit) {
+        if (produit == null) {
+            return null;
+        }
+
+        ProduitWithArticlesDTO dto = new ProduitWithArticlesDTO();
+        dto.setId(produit.getId());
+        dto.setNom(produit.getNom());
+        dto.setDescription(produit.getDescription());
+        dto.setImage(produit.getImage());
+        dto.setStatut(produit.getStatut());
+        dto.setCreatedAt(produit.getCreatedAt());
+
+        // Mapper les relations
+        if (produit.getBoutique() != null) {
+            dto.setBoutiqueId(produit.getBoutique().getId());
+        }
+        if (produit.getSousCategorie() != null) {
+            dto.setSousCategorieId(produit.getSousCategorie().getId());
+        }
+
+        // Mapper les articles
+        if (produit.getArticles() != null) {
+            List<ArticleDTO> articleDTOs = produit.getArticles().stream()
+                    .map(this::mapArticleToDTO)
+                    .collect(Collectors.toList());
+            dto.setArticles(articleDTOs);
+        }
+
+        return dto;
+    }
+
+    /**
+     * Convertit une entité Article en ArticleDTO
+     */
+    private ArticleDTO mapArticleToDTO(Article article) {
+        if (article == null) {
+            return null;
+        }
+
+        ArticleDTO dto = new ArticleDTO();
+        dto.setId(article.getId());
+        dto.setSku(article.getSku());
+        dto.setPrix(article.getPrix());
+        dto.setStockActuel(article.getStockActuel());
+        dto.setAttributs(article.getAttributs());
+        dto.setImage(article.getImage());
+
+        if (article.getProduit() != null) {
+            dto.setProduitId(article.getProduit().getId());
+        }
+
+        return dto;
     }
 }

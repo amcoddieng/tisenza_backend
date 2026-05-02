@@ -1,9 +1,17 @@
 package com.tissenza.tissenza_backend.modules.produit.service;
 
 import com.tissenza.tissenza_backend.modules.produit.dto.ProduitDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ProduitWithArticlesDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ProduitWithArticlesRequest;
+import com.tissenza.tissenza_backend.modules.produit.dto.ArticleRequest;
 import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
+import com.tissenza.tissenza_backend.modules.produit.entity.Article;
+import com.tissenza.tissenza_backend.modules.produit.entity.SousCategorie;
 import com.tissenza.tissenza_backend.modules.produit.mapper.ProduitMapper;
+import com.tissenza.tissenza_backend.modules.produit.mapper.ArticleMapper;
 import com.tissenza.tissenza_backend.modules.produit.repository.ProduitRepository;
+import com.tissenza.tissenza_backend.modules.produit.repository.ArticleRepository;
+import com.tissenza.tissenza_backend.service.LocalStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +27,9 @@ public class ProduitService {
 
     private final ProduitRepository produitRepository;
     private final ProduitMapper produitMapper;
+    private final ArticleRepository articleRepository;
+    private final ArticleMapper articleMapper;
+    private final LocalStorageService localStorageService;
 
     public Produit createProduit(Produit produit) {
         return produitRepository.save(produit);
@@ -442,6 +453,84 @@ public class ProduitService {
         } catch (Exception e) {
             log.error("Erreur lors de la désactivation du produit DTO: {}", id, e);
             throw new RuntimeException("Impossible de désactiver le produit", e);
+        }
+    }
+
+    /**
+     * Crée un produit avec plusieurs articles en une seule transaction
+     */
+    @Transactional
+    public ProduitWithArticlesDTO createProduitWithArticles(ProduitWithArticlesRequest request, org.springframework.web.multipart.MultipartFile imageFile) {
+        try {
+            log.info("Création d'un produit avec {} articles", request.getArticles().size());
+            
+            // 1. Créer le produit
+            Produit produit = new Produit();
+            
+            // Configurer les relations
+            com.tissenza.tissenza_backend.modules.boutique.entity.Boutique boutique = new com.tissenza.tissenza_backend.modules.boutique.entity.Boutique();
+            boutique.setId(request.getBoutiqueId());
+            produit.setBoutique(boutique);
+            
+            SousCategorie sousCategorie = new SousCategorie();
+            sousCategorie.setId(request.getSousCategorieId());
+            produit.setSousCategorie(sousCategorie);
+            
+            // Configurer les attributs du produit
+            produit.setNom(request.getNom());
+            produit.setDescription(request.getDescription());
+            produit.setStatut(Produit.Statut.valueOf(request.getStatut()));
+            
+            // Gérer l'image du produit si fournie
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String imageUrl = localStorageService.storeFile(imageFile, com.tissenza.tissenza_backend.service.LocalStorageService.FileType.PRODUIT);
+                produit.setImage(imageUrl);
+                log.info("Image du produit stockée: {}", imageUrl);
+            }
+            
+            // Sauvegarder le produit
+            Produit savedProduit = produitRepository.save(produit);
+            log.info("Produit créé avec ID: {}", savedProduit.getId());
+            
+            // 2. Créer les articles
+            for (ArticleRequest articleRequest : request.getArticles()) {
+                Article article = new Article();
+                article.setProduit(savedProduit);
+                article.setSku(articleRequest.getSku());
+                article.setPrix(articleRequest.getPrix());
+                article.setStockActuel(articleRequest.getStock());
+                // Convertir les attributs Map en String JSON
+                if (articleRequest.getAttributs() != null) {
+                    try {
+                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                        article.setAttributs(mapper.writeValueAsString(articleRequest.getAttributs()));
+                    } catch (Exception e) {
+                        log.warn("Erreur lors de la conversion des attributs en JSON: {}", e.getMessage());
+                        article.setAttributs("{}");
+                    }
+                }
+                
+                // Les images des articles peuvent être gérées séparément via une autre API
+                // Pour l'instant, on laisse l'image null ou on utilise une valeur par défaut
+                article.setImage(null);
+                
+                articleRepository.save(article);
+                log.info("Article créé avec SKU: {}", article.getSku());
+            }
+            
+            log.info("Création terminée: {} articles créés pour le produit {}", 
+                    request.getArticles().size(), savedProduit.getId());
+            
+            // Recharger le produit avec ses articles pour le DTO
+            Produit produitWithArticles = produitRepository.findById(savedProduit.getId())
+                    .orElseThrow(() -> new RuntimeException("Produit non trouvé après création"));
+            
+            // Retourner le DTO du produit avec ses articles
+            return produitMapper.toDTOWithArticles(produitWithArticles);
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de la création du produit avec articles: {}", e.getMessage(), e);
+            throw new RuntimeException("Impossible de créer le produit avec articles", e);
         }
     }
 }

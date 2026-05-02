@@ -1346,6 +1346,96 @@ image: [fichier image]
 
 **Note :** Les images des produits sont des fichiers images (JPG, PNG, etc.) stockés en local dans le dossier `/uploads/produit/`.
 
+#### Créer un produit avec plusieurs articles
+```http
+POST /api/produits/with-articles
+Content-Type: multipart/form-data
+
+boutiqueId: 1
+sousCategorieId: 1
+nom: "Chemise en coton"
+description: "Chemise confortable en coton bio disponible en plusieurs tailles et couleurs"
+statut: "ACTIF"
+image: [fichier image du produit]
+articles: [
+  {
+    "sku": "CHEMISE-ROUGE-M",
+    "prix": 29.99,
+    "stock": 50,
+    "attributs": {
+      "taille": "M",
+      "couleur": "rouge",
+      "matiere": "coton"
+    }
+  },
+  {
+    "sku": "CHEMISE-ROUGE-L",
+    "prix": 29.99,
+    "stock": 30,
+    "attributs": {
+      "taille": "L",
+      "couleur": "rouge",
+      "matiere": "coton"
+    }
+  },
+  {
+    "sku": "CHEMISE-BLEU-M",
+    "prix": 29.99,
+    "stock": 45,
+    "attributs": {
+      "taille": "M",
+      "couleur": "bleu",
+      "matiere": "coton"
+    }
+  }
+]
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "boutiqueId": 1,
+  "sousCategorieId": 1,
+  "nom": "Chemise en coton",
+  "description": "Chemise confortable en coton bio disponible en plusieurs tailles et couleurs",
+  "image": "/uploads/produit/uuid-chemise.jpg",
+  "statut": "ACTIF",
+  "createdAt": "2026-04-30T20:01:31",
+  "articles": [
+    {
+      "id": 1,
+      "produitId": 1,
+      "sku": "CHEMISE-ROUGE-M",
+      "prix": 29.99,
+      "stockActuel": 50,
+      "attributs": "{\"taille\":\"M\",\"couleur\":\"rouge\",\"matiere\":\"coton\"}",
+      "image": null
+    },
+    {
+      "id": 2,
+      "produitId": 1,
+      "sku": "CHEMISE-ROUGE-L",
+      "prix": 29.99,
+      "stockActuel": 30,
+      "attributs": "{\"taille\":\"L\",\"couleur\":\"rouge\",\"matiere\":\"coton\"}",
+      "image": null
+    },
+    {
+      "id": 3,
+      "produitId": 1,
+      "sku": "CHEMISE-BLEU-M",
+      "prix": 29.99,
+      "stockActuel": 45,
+      "attributs": "{\"taille\":\"M\",\"couleur\":\"bleu\",\"matiere\":\"coton\"}",
+      "image": null
+    }
+  ]
+}
+```
+
+**Note :** Cette API utilise une transaction atomique. Si la création d'un article échoue, toute l'opération (produit + tous les articles) est annulée.
+
 #### Lister les produits avec articles
 ```http
 GET /api/produits/1/with-articles
@@ -2075,4 +2165,263 @@ GET /api/paiement/associations/user/{userId}/count
 
 ---
 
-*Dernière mise à jour: 20 Avril 2026*
+## **APIs de Panier**
+
+### Gestion des Paniers
+
+#### Récupérer le panier actif d'un client
+```http
+GET /api/paniers/client/{clientId}/actif
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "clientId": 1,
+  "dateCreation": "2026-05-01 10:00:00",
+  "updatedDate": "2026-05-01 10:30:00",
+  "status": "EN_ATTENTE",
+  "total": 149.97,
+  "items": [
+    {
+      "id": 1,
+      "panierId": 1,
+      "articleId": 1,
+      "quantite": 2,
+      "prixUnitaire": 29.99,
+      "sousTotal": 59.98,
+      "date": "2026-05-01 10:15:00",
+      "articleSku": "CHEMISE-ROUGE-M",
+      "articleNom": "Chemise en coton",
+      "articleImage": "/uploads/produit/chemise.jpg"
+    },
+    {
+      "id": 2,
+      "panierId": 1,
+      "articleId": 2,
+      "quantite": 3,
+      "prixUnitaire": 29.99,
+      "sousTotal": 89.97,
+      "date": "2026-05-01 10:20:00",
+      "articleSku": "PANTON-BLEU-L",
+      "articleNom": "Pantalon en denim",
+      "articleImage": "/uploads/produit/pantalon.jpg"
+    }
+  ]
+}
+```
+
+#### Ajouter un article au panier
+```http
+POST /api/paniers/client/{clientId}/ajouter
+Content-Type: application/json
+
+{
+  "articleId": 1,
+  "quantite": 2,
+  "prixUnitaire": 29.99
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "clientId": 1,
+  "dateCreation": "2026-05-01 10:00:00",
+  "updatedDate": "2026-05-01 10:30:00",
+  "status": "EN_ATTENTE",
+  "total": 149.97,
+  "items": [...]
+}
+```
+
+#### Mettre à jour la quantité d'un article
+```http
+PUT /api/paniers/{panierId}/article/{articleId}/quantite?quantite=3
+```
+
+#### Supprimer un article du panier
+```http
+DELETE /api/paniers/{panierId}/article/{articleId}
+```
+
+#### Vider le panier
+```http
+DELETE /api/paniers/{panierId}/vider
+```
+
+#### Valider le panier
+```http
+POST /api/paniers/{panierId}/valider
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "clientId": 1,
+  "dateCreation": "2026-05-01 10:00:00",
+  "updatedDate": "2026-05-01 10:30:00",
+  "status": "VALIDE",
+  "total": 149.97,
+  "items": [...]
+}
+```
+
+#### Récupérer un panier par ID
+```http
+GET /api/paniers/{panierId}
+```
+
+#### Récupérer tous les paniers d'un client
+```http
+GET /api/paniers/client/{clientId}
+```
+
+---
+
+## **APIs de Commande**
+
+### Gestion des Commandes
+
+#### Créer une commande à partir d'un panier
+```http
+POST /api/commandes/creer/{panierId}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "clientId": 1,
+  "panierId": 1,
+  "date": "2026-05-01 11:00:00",
+  "status": "EN_ATTENTE",
+  "total": 149.97,
+  "statusPaiement": "EN_ATTENTE",
+  "details": [
+    {
+      "id": 1,
+      "commandeId": 1,
+      "articleId": 1,
+      "quantite": 2,
+      "prixUnitaire": 29.99,
+      "sousTotal": 59.98,
+      "date": "2026-05-01 11:00:00",
+      "articleSku": "CHEMISE-ROUGE-M",
+      "articleNom": "Chemise en coton",
+      "articleImage": "/uploads/produit/chemise.jpg"
+    },
+    {
+      "id": 2,
+      "commandeId": 1,
+      "articleId": 2,
+      "quantite": 3,
+      "prixUnitaire": 29.99,
+      "sousTotal": 89.97,
+      "date": "2026-05-01 11:00:00",
+      "articleSku": "PANTON-BLEU-L",
+      "articleNom": "Pantalon en denim",
+      "articleImage": "/uploads/produit/pantalon.jpg"
+    }
+  ]
+}
+```
+
+#### Récupérer une commande par ID
+```http
+GET /api/commandes/{commandeId}
+```
+
+#### Récupérer toutes les commandes d'un client
+```http
+GET /api/commandes/client/{clientId}
+```
+
+#### Récupérer les commandes par statut
+```http
+GET /api/commandes/statut/EN_ATTENTE
+GET /api/commandes/statut/CONFIRMEE
+GET /api/commandes/statut/EN_PREPARATION
+GET /api/commandes/statut/ENVOYEE
+GET /api/commandes/statut/LIVREE
+GET /api/commandes/statut/ANNULEE
+```
+
+#### Récupérer les commandes par statut de paiement
+```http
+GET /api/commandes/paiement/EN_ATTENTE
+GET /api/commandes/paiement/PAYEE
+GET /api/commandes/paiement/REMBOURSEE
+GET /api/commandes/paiement/ECHOUE
+```
+
+#### Mettre à jour le statut d'une commande
+```http
+PUT /api/commandes/{commandeId}/statut?statut=CONFIRMEE
+```
+
+#### Mettre à jour le statut de paiement d'une commande
+```http
+PUT /api/commandes/{commandeId}/paiement?statutPaiement=PAYEE
+```
+
+#### Annuler une commande
+```http
+POST /api/commandes/{commandeId}/annuler
+```
+
+#### Calculer le chiffre d'affaires total
+```http
+GET /api/commandes/chiffre-affaires
+```
+
+**Response (200 OK):**
+```json
+15456.78
+```
+
+#### Supprimer une commande (administrateur)
+```http
+DELETE /api/commandes/{commandeId}
+```
+
+---
+
+### **Statuts possibles**
+
+**Panier :**
+- `EN_ATTENTE` : Panier actif, en cours de modification
+- `VALIDE` : Panier validé, transformé en commande
+- `ANNULE` : Panier annulé
+
+**Commande :**
+- `EN_ATTENTE` : Commande en attente de confirmation
+- `CONFIRMEE` : Commande confirmée, en préparation
+- `EN_PREPARATION` : Commande en cours de préparation
+- `ENVOYEE` : Commande envoyée au client
+- `LIVREE` : Commande livrée avec succès
+- `ANNULEE` : Commande annulée
+
+**Paiement :**
+- `EN_ATTENTE` : Paiement en attente
+- `PAYEE` : Paiement effectué
+- `REMBOURSEE` : Paiement remboursé
+- `ECHOUE` : Paiement échoué
+
+---
+
+### **Workflow complet**
+
+1. **Créer/Récupérer le panier actif** : `GET /api/paniers/client/{clientId}/actif`
+2. **Ajouter des articles** : `POST /api/paniers/client/{clientId}/ajouter`
+3. **Modifier les quantités** : `PUT /api/paniers/{panierId}/article/{articleId}/quantite`
+4. **Valider le panier** : `POST /api/paniers/{panierId}/valider`
+5. **Créer la commande** : `POST /api/commandes/creer/{panierId}`
+6. **Gérer la commande** : Mettre à jour statut, paiement, etc.
+
+---
+
+*Dernière mise à jour: 1 Mai 2026*
