@@ -1,122 +1,122 @@
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\config\JwtFilter.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\config\JwtUtil.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\config\RedisConfig.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\config\SwaggerConfig.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\response\ApiResponse.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\config\CloudinaryConfig.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\config\DataInitializer.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\config\WebConfig.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\controller\BaseController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\controller\HelloController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\controller\ImageController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\ApiResponse.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\BusinessException.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\GlobalExceptionHandler.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\ResourceNotFoundException.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\ValidationException.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\controller\AuthController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\controller\AuthDiagnosticController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\dto\LoginRequest.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\dto\LoginResponse.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\dto\RegisterRequest.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\dto\RegisterResponse.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\exception\AccountLockedException.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\exception\AuthenticationException.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\exception\InvalidCredentialsException.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\security\JwtAuthenticationFilter.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\security\JwtUtils.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\security\SecurityConfig.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\security\UserDetailsServiceImpl.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\service\AuthService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\controller\BoutiqueController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\controller\DocumentController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\dto\BoutiqueCreationDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\dto\BoutiqueDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\dto\DocumentDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\dto\VendeurInfo.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\entity\Boutique.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\entity\Document.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\mapper\BoutiqueMapper.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\mapper\DocumentMapper.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\repository\BoutiqueRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\repository\DocumentRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\service\BoutiqueService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\service\DocumentService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\controller\CommandeController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\dto\CommandeDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\dto\DetailCommandeDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\entity\Commande.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\entity\DetailCommande.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\mapper\CommandeMapper.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\repository\CommandeRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\repository\DetailCommandeRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\service\CommandeService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\controller\MoyenPaiementController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\dto\MoyenPaiementDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\dto\UserMoyenPaiementDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\entity\MoyenPaiement.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\entity\UserMoyenPaiement.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\mapper\PaiementMapper.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\repository\MoyenPaiementRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\repository\UserMoyenPaiementRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\service\MoyenPaiementService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\controller\PanierController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\dto\AjoutPanierRequest.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\dto\PanierDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\dto\PanierItemDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\entity\Panier.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\entity\PanierItem.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\mapper\PanierMapper.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\repository\PanierItemRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\repository\PanierRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\service\PanierService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\ArticleController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\CategorieController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\HistoriqueStockController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\ProduitController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\SousCategorieController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\converter\JsonStringConverter.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ArticleDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ArticleRequest.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\CategorieDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\HistoriqueStockDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitWithArticlesDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitWithArticlesRequest.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\SousCategorieDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\StockMovementDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\Article.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\Categorie.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\HistoriqueStock.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\Produit.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\SousCategorie.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\ArticleMapper.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\CategorieMapper.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\ProduitMapper.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\ArticleRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\CategorieRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\HistoriqueStockRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\ProduitRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\SousCategorieRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\ArticleService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\CategorieService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\HistoriqueStockService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\ProduitService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\SousCategorieService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\controller\CompteController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\controller\PersonneController.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\CompteDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\CompteWithPersonneDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\PersonneDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\PersonneSimpleDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\UserProfileDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\UserRegistrationDTO.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\entity\Compte.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\entity\Personne.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\repository\CompteRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\repository\PersonneRepository.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\service\CompteService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\service\PersonneService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\service\CloudinaryService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\service\LocalStorageService.java
-C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\TissenzaBackendApplication.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\config\JwtFilter.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\config\JwtUtil.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\config\RedisConfig.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\config\SwaggerConfig.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\common\response\ApiResponse.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\config\CloudinaryConfig.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\config\DataInitializer.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\config\WebConfig.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\controller\BaseController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\controller\HelloController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\controller\ImageController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\ApiResponse.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\BusinessException.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\GlobalExceptionHandler.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\ResourceNotFoundException.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\exception\ValidationException.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\controller\AuthController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\controller\AuthDiagnosticController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\dto\LoginRequest.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\dto\LoginResponse.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\dto\RegisterRequest.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\dto\RegisterResponse.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\exception\AccountLockedException.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\exception\AuthenticationException.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\exception\InvalidCredentialsException.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\security\JwtAuthenticationFilter.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\security\JwtUtils.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\security\SecurityConfig.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\security\UserDetailsServiceImpl.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\auth\service\AuthService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\controller\BoutiqueController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\controller\DocumentController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\dto\BoutiqueCreationDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\dto\BoutiqueDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\dto\DocumentDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\dto\VendeurInfo.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\entity\Boutique.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\entity\Document.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\mapper\BoutiqueMapper.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\mapper\DocumentMapper.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\repository\BoutiqueRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\repository\DocumentRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\service\BoutiqueService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\boutique\service\DocumentService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\controller\CommandeController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\dto\CommandeDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\dto\DetailCommandeDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\entity\Commande.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\entity\DetailCommande.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\mapper\CommandeMapper.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\repository\CommandeRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\repository\DetailCommandeRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\commande\service\CommandeService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\controller\MoyenPaiementController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\dto\MoyenPaiementDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\dto\UserMoyenPaiementDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\entity\MoyenPaiement.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\entity\UserMoyenPaiement.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\mapper\PaiementMapper.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\repository\MoyenPaiementRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\repository\UserMoyenPaiementRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\paiement\service\MoyenPaiementService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\controller\PanierController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\dto\AjoutPanierRequest.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\dto\PanierDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\dto\PanierItemDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\entity\Panier.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\entity\PanierItem.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\mapper\PanierMapper.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\repository\PanierItemRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\repository\PanierRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\panier\service\PanierService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\ArticleController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\CategorieController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\HistoriqueStockController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\ProduitController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\controller\SousCategorieController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\converter\JsonStringConverter.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ArticleDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ArticleRequest.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\CategorieDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\HistoriqueStockDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitWithArticlesDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitWithArticlesRequest.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\SousCategorieDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\StockMovementDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\Article.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\Categorie.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\HistoriqueStock.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\Produit.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\SousCategorie.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\ArticleMapper.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\CategorieMapper.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\ProduitMapper.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\ArticleRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\CategorieRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\HistoriqueStockRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\ProduitRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\SousCategorieRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\ArticleService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\CategorieService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\HistoriqueStockService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\ProduitService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\service\SousCategorieService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\controller\CompteController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\controller\PersonneController.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\CompteDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\CompteWithPersonneDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\PersonneDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\PersonneSimpleDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\UserProfileDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\UserRegistrationDTO.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\entity\Compte.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\entity\Personne.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\repository\CompteRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\repository\PersonneRepository.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\service\CompteService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\service\PersonneService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\service\CloudinaryService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\service\LocalStorageService.java
+C:\Users\HP 450 G8\Documents\projetTissenza\code1\tisenza_backend\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\TissenzaBackendApplication.java
