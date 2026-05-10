@@ -111,6 +111,39 @@ public class CommandeController {
     }
 
     /**
+     * Récupérer toutes les commandes
+     */
+    @GetMapping
+    @Operation(summary = "Récupérer toutes les commandes", description = "Récupère la liste de toutes les commandes du système")
+    public ResponseEntity<List<CommandeDTO>> getAllCommandes() {
+        
+        try {
+            List<CommandeDTO> commandes = commandeService.getAllCommandes();
+            return ResponseEntity.ok(commandes);
+        } catch (Exception e) {
+            log.error("Erreur lors de la récupération de toutes les commandes: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Récupérer les commandes par boutique
+     */
+    @GetMapping("/boutique/{boutiqueId}")
+    @Operation(summary = "Récupérer les commandes par boutique", description = "Récupère toutes les commandes contenant des produits d'une boutique spécifique")
+    public ResponseEntity<List<CommandeDTO>> getCommandesByBoutique(
+            @Parameter(description = "ID de la boutique") @PathVariable Long boutiqueId) {
+        
+        try {
+            List<CommandeDTO> commandes = commandeService.getCommandesByBoutique(boutiqueId);
+            return ResponseEntity.ok(commandes);
+        } catch (Exception e) {
+            log.error("Erreur lors de la récupération des commandes pour la boutique {}: {}", boutiqueId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
      * Mettre à jour le statut d'une commande
      */
     @PutMapping("/{commandeId}/statut")

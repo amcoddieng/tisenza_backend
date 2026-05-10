@@ -48,6 +48,6 @@ public class Boutique {
     private LocalDateTime createdAt;
 
     public enum Statut {
-        EN_ATTENTE, VALIDE, REFUSE
+        EN_ATTENTE, VALIDE, REFUSE, SUSPENDU
     }
 }

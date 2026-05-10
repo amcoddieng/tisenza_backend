@@ -172,6 +172,24 @@ public class CommandeService {
     }
 
     /**
+     * Récupérer toutes les commandes
+     */
+    @Transactional(readOnly = true)
+    public List<CommandeDTO> getAllCommandes() {
+        List<Commande> commandes = commandeRepository.findAll();
+        return commandeMapper.toDTOList(commandes);
+    }
+
+    /**
+     * Récupérer les commandes par boutique
+     */
+    @Transactional(readOnly = true)
+    public List<CommandeDTO> getCommandesByBoutique(Long boutiqueId) {
+        List<Commande> commandes = commandeRepository.findByBoutiqueId(boutiqueId);
+        return commandeMapper.toDTOList(commandes);
+    }
+
+    /**
      * Calculer le chiffre d'affaires total
      */
     @Transactional(readOnly = true)

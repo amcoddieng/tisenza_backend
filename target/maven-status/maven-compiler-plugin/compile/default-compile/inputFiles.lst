@@ -106,6 +106,7 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\controller\CompteController.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\controller\PersonneController.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\CompteDTO.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\ComptePersonneUpdateDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\CompteWithPersonneDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\PersonneDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\PersonneSimpleDTO.java

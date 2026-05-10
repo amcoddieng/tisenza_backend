@@ -3,6 +3,7 @@ package com.tissenza.tissenza_backend.modules.user.controller;
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
 import com.tissenza.tissenza_backend.modules.user.dto.CompteDTO;
 import com.tissenza.tissenza_backend.modules.user.dto.CompteWithPersonneDTO;
+import com.tissenza.tissenza_backend.modules.user.dto.ComptePersonneUpdateDTO;
 import com.tissenza.tissenza_backend.modules.user.service.CompteService;
 import com.tissenza.tissenza_backend.exception.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -236,6 +237,46 @@ public class CompteController {
         try {
             CompteWithPersonneDTO compteDTO = compteService.getCompteWithPersonneByEmail(email);
             return ResponseEntity.ok(ApiResponse.success(compteDTO, "Compte récupéré avec succès"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Compte non trouvé"));
+        }
+    }
+
+    @PutMapping("/{id}/deactivate")
+    @Operation(summary = "Désactiver un compte", description = "Désactive un compte en changeant son statut à INACTIF")
+    public ResponseEntity<ApiResponse<Compte>> deactivateCompte(
+            @Parameter(description = "ID du compte à désactiver") @PathVariable Long id) {
+        try {
+            Compte deactivatedCompte = compteService.changeStatut(id, Compte.Statut.INACTIF);
+            return ResponseEntity.ok(ApiResponse.success(deactivatedCompte, "Compte désactivé avec succès"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Compte non trouvé"));
+        }
+    }
+
+    @PutMapping("/{id}/activate")
+    @Operation(summary = "Activer un compte", description = "Active un compte en changeant son statut à ACTIF")
+    public ResponseEntity<ApiResponse<Compte>> activateCompte(
+            @Parameter(description = "ID du compte à activer") @PathVariable Long id) {
+        try {
+            Compte activatedCompte = compteService.changeStatut(id, Compte.Statut.ACTIF);
+            return ResponseEntity.ok(ApiResponse.success(activatedCompte, "Compte activé avec succès"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Compte non trouvé"));
+        }
+    }
+
+    @PutMapping("/{id}/with-personne")
+    @Operation(summary = "Mettre à jour un compte et sa personne", description = "Met à jour simultanément les informations du compte et de sa personne associée")
+    public ResponseEntity<ApiResponse<CompteWithPersonneDTO>> updateCompteAndPersonne(
+            @Parameter(description = "ID du compte à mettre à jour") @PathVariable Long id,
+            @RequestBody ComptePersonneUpdateDTO updateDTO) {
+        try {
+            CompteWithPersonneDTO updatedCompte = compteService.updateCompteAndPersonne(id, updateDTO);
+            return ResponseEntity.ok(ApiResponse.success(updatedCompte, "Compte et personne mis à jour avec succès"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("Compte non trouvé"));

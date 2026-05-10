@@ -59,8 +59,10 @@ public class DataInitializer implements CommandLineRunner {
         initializeBoutiquesForVendors();
         initializeProductsForBoutiques();
         initializeArticlesForProducts();
-        initializePaniersForClients();
-        initializeCommandesFromPaniers();
+        // Désactiver temporairement les paniers et commandes pour éviter les erreurs de démarrage
+        // initializePaniersForClients();
+        // initializeCommandesFromPaniers();
+        log.info("Initialisation des données de base terminée !");
     }
 
     private void initializeUsers() {
@@ -337,7 +339,7 @@ public class DataInitializer implements CommandLineRunner {
         // Noms de boutiques plus variés selon le vendeur
         String[] nomsBoutiques = {
             "Fashion Style", "Mode Élégante", "Vêtements Chic", "Style Dakar", 
-            "Boutique Moderne", "Tendance Mode", "Fashion House", "Style Urbain"
+            "Boutique Moderne", "Tendance Mode"
         };
         String[] descriptions = {
             "Spécialisée dans la mode masculine et féminine",
@@ -402,7 +404,7 @@ public class DataInitializer implements CommandLineRunner {
         
         produit.setNom(nomProduit);
         produit.setDescription(description);
-        produit.setImage("/uploads/produit/default-product.jpg"); // Image locale par défaut
+        produit.setImage("/uploads/produit/image.jpeg"); // Image locale par défaut
         produit.setStatut(Produit.Statut.ACTIF);
         produit.setCreatedAt(LocalDateTime.now());
         return produit;
@@ -425,14 +427,15 @@ public class DataInitializer implements CommandLineRunner {
         String categoryKey = getCategoryKey(sousCategorie);
         String[] names = getProductNamesByCategory(categoryKey, productNames);
         
-        if (names != null && names.length > 0) {
-            String baseName = names[index % names.length];
+        if (names != null && names.length > 0 && index >= 0) {
+            String baseName = names[Math.abs(index) % names.length];
             String[] adjectives = {"Élégant", "Moderne", "Classique", "Tendance", "Sportif", "Chic", "Urbain", "Décontracté"};
-            String adjective = adjectives[(index + baseName.hashCode()) % adjectives.length];
-            return adjective + " " + baseName + " " + (index + 1);
+            int adjectiveIndex = Math.abs(index + baseName.hashCode()) % adjectives.length;
+            String adjective = adjectives[adjectiveIndex];
+            return adjective + " " + baseName + " " + (Math.abs(index) + 1);
         }
         
-        return "Produit " + (index + 1) + " - " + sousCategorie;
+        return "Produit " + (Math.abs(index) + 1) + " - " + sousCategorie;
     }
     
     private String getCategoryKey(String sousCategorie) {
@@ -493,8 +496,8 @@ public class DataInitializer implements CommandLineRunner {
         List<Produit> produits = produitRepository.findAll();
 
         for (Produit produit : produits) {
-            // Créer 2-4 articles par produit (différentes tailles/couleurs)
-            int articlesCount = 2 + (int)(Math.random() * 3); // 2 à 4 articles
+            // Créer 1-3 articles par produit (différentes tailles/couleurs)
+            int articlesCount = 1 + (int)(Math.random() * 2); // 1 à 3 articles
             
             for (int i = 0; i < articlesCount; i++) {
                 Article article = createArticleForProduct(produit, i);
@@ -521,7 +524,7 @@ public class DataInitializer implements CommandLineRunner {
         String attributsJson = generateAttributesByCategory(produit.getSousCategorie().getNom(), index);
         article.setAttributs(attributsJson);
         
-        article.setImage("/uploads/produit/article-" + produit.getId() + "-" + (index + 1) + ".jpg");
+        article.setImage("/uploads/produit/image.jpeg");
         return article;
     }
     
@@ -662,7 +665,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initializePaniersForClients() {
-        log.info("Initialisation des paniers pour chaque client...");
+        log.info("Initialisation des paniers simples pour les clients...");
 
         // Vérifier si les paniers existent déjà
         if (panierRepository.count() > 0) {
@@ -672,22 +675,26 @@ public class DataInitializer implements CommandLineRunner {
 
         // Récupérer tous les clients
         List<Compte> clients = compteRepository.findByRole(Compte.Role.CLIENT);
-        List<Article> articles = articleRepository.findAll();
 
+        int paniersCrées = 0;
         for (Compte client : clients) {
-            // Créer 1-3 paniers par client avec différents statuts
-            int paniersCount = 1 + (int)(Math.random() * 3); // 1 à 3 paniers
-            
-            for (int i = 0; i < paniersCount; i++) {
-                Panier panier = createPanierForClient(client, i, articles);
+            try {
+                // Créer un panier simple par client (sans items pour éviter les erreurs)
+                Panier panier = new Panier();
+                panier.setClient(client.getPersonne());
+                panier.setStatus(Panier.PanierStatus.EN_ATTENTE);
+                panier.setTotal(java.math.BigDecimal.ZERO);
+                
                 panierRepository.save(panier);
                 
-                // Ajouter quelques articles au panier
-                addRandomArticlesToPanier(panier, articles);
-                
-                log.info("Panier créé pour le client {}: {}", client.getEmail(), panier.getStatus());
+                paniersCrées++;
+                log.info("Panier simple créé pour le client {}: {}", client.getEmail(), panier.getId());
+            } catch (Exception e) {
+                log.error("Erreur lors de la création du panier pour le client {}: {}", client.getEmail(), e.getMessage());
             }
         }
+        
+        log.info("Initialisation des paniers simples terminée. {} paniers créés.", paniersCrées);
     }
 
     private Panier createPanierForClient(Compte client, int index, List<Article> articles) {
@@ -745,6 +752,40 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initializeCommandesFromPaniers() {
+        log.info("Initialisation des commandes de test simples...");
+
+        // Vérifier si les commandes existent déjà
+        if (commandeRepository.count() > 0) {
+            log.info("Les commandes existent déjà, initialisation ignorée.");
+            return;
+        }
+
+        // Récupérer tous les clients pour créer des commandes de test
+        List<Compte> clients = compteRepository.findByRole(Compte.Role.CLIENT);
+
+        int commandesCrées = 0;
+        for (Compte client : clients) {
+            try {
+                // Créer une commande de test par client (sans détails pour éviter les erreurs)
+                Commande commande = new Commande();
+                commande.setClient(client.getPersonne());
+                commande.setTotal(java.math.BigDecimal.valueOf(25000 + (Math.random() * 75000))); // 25k-100k FCFA
+                commande.setStatus(Commande.CommandeStatus.EN_PREPARATION);
+                commande.setStatusPaiement(Commande.StatusPaiement.PAYEE);
+                
+                commandeRepository.save(commande);
+                
+                commandesCrées++;
+                log.info("Commande simple créée pour le client {}: {}", client.getEmail(), commande.getId());
+            } catch (Exception e) {
+                log.error("Erreur lors de la création de la commande pour le client {}: {}", client.getEmail(), e.getMessage());
+            }
+        }
+        
+        log.info("Initialisation des commandes simples terminée. {} commandes créées.", commandesCrées);
+    }
+
+    private void initializeCommandesFromPaniersOld() {
         log.info("Initialisation des commandes à partir des paniers validés...");
 
         // Vérifier si les commandes existent déjà

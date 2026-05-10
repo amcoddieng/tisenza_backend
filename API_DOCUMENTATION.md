@@ -2358,6 +2358,69 @@ GET /api/commandes/paiement/REMBOURSEE
 GET /api/commandes/paiement/ECHOUE
 ```
 
+#### Récupérer toutes les commandes
+```http
+GET /api/commandes
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "client": {
+      "id": 1,
+      "nom": "Sow",
+      "prenom": "Abdou"
+    },
+    "statut": "EN_PREPARATION",
+    "statutPaiement": "PAYEE",
+    "total": 25000.00,
+    "date": "2026-05-02T10:30:00",
+    "details": [
+      {
+        "article": {
+          "id": 1,
+          "nom": "Élégant Chemise 1",
+          "prix": 15000.00
+        },
+        "quantite": 1,
+        "prixUnitaire": 15000.00,
+        "sousTotal": 15000.00
+      }
+    ]
+  }
+]
+```
+
+#### Récupérer les commandes par boutique
+```http
+GET /api/commandes/boutique/{boutiqueId}
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "client": {
+      "id": 1,
+      "nom": "Sow",
+      "prenom": "Abdou"
+    },
+    "statut": "LIVREE",
+    "statutPaiement": "PAYEE",
+    "total": 45000.00,
+    "date": "2026-05-02T10:30:00"
+  }
+]
+```
+
+#### Récupérer les commandes par statut de paiement
+```http
+GET /api/commandes/paiement/{statutPaiement}
+```
+
 #### Mettre à jour le statut d'une commande
 ```http
 PUT /api/commandes/{commandeId}/statut?statut=CONFIRMEE

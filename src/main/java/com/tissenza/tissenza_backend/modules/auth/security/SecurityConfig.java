@@ -60,11 +60,24 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
+                // Endpoints publics sans authentification
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/error").permitAll()
+                
+                // APIs de développement - accès sans authentification
+                .requestMatchers("/api/personnes/**").permitAll()
+                .requestMatchers("/api/comptes/**").permitAll()
+                .requestMatchers("/api/categories/**").permitAll()
+                .requestMatchers("/api/boutiques/**").permitAll()
+                .requestMatchers("/api/produits/**").permitAll()
+                .requestMatchers("/api/articles/**").permitAll()
+                .requestMatchers("/api/paniers/**").permitAll()
+                .requestMatchers("/api/commandes/**").permitAll()
+                
+                // Toutes les autres requêtes nécessitent une authentification
                 .anyRequest().authenticated()
             );
 

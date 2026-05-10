@@ -69,4 +69,15 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
      */
     @Query("SELECT c FROM Commande c WHERE c.client.id = :clientId ORDER BY c.date DESC")
     Optional<Commande> findLastCommandeByClient(@Param("clientId") Long clientId);
+
+    /**
+     * Trouver les commandes par boutique
+     */
+    @Query("SELECT DISTINCT c FROM Commande c " +
+           "JOIN c.details d " +
+           "JOIN d.article a " +
+           "JOIN a.produit p " +
+           "JOIN p.boutique b " +
+           "WHERE b.id = :boutiqueId")
+    List<Commande> findByBoutiqueId(@Param("boutiqueId") Long boutiqueId);
 }

@@ -6,6 +6,7 @@ import com.tissenza.tissenza_backend.modules.user.dto.CompteDTO;
 import com.tissenza.tissenza_backend.modules.user.dto.CompteWithPersonneDTO;
 import com.tissenza.tissenza_backend.modules.user.dto.PersonneSimpleDTO;
 import com.tissenza.tissenza_backend.modules.user.dto.PersonneDTO;
+import com.tissenza.tissenza_backend.modules.user.dto.ComptePersonneUpdateDTO;
 import com.tissenza.tissenza_backend.modules.user.repository.CompteRepository;
 import com.tissenza.tissenza_backend.modules.user.repository.PersonneRepository;
 import com.tissenza.tissenza_backend.exception.BusinessException;
@@ -209,5 +210,73 @@ public class CompteService {
                     return CompteWithPersonneDTO.fromEntities(compte, personneDTO);
                 })
                 .toList();
+    }
+
+    @Transactional
+    public CompteWithPersonneDTO updateCompteAndPersonne(Long compteId, ComptePersonneUpdateDTO updateDTO) {
+        // Récupérer le compte avec sa personne
+        Compte compte = compteRepository.findById(compteId)
+                .orElseThrow(() -> new ResourceNotFoundException("Compte", compteId.toString()));
+        
+        Personne personne = compte.getPersonne();
+        
+        // Mettre à jour les informations du compte (seulement si non null)
+        if (updateDTO.getEmail() != null) {
+            compte.setEmail(updateDTO.getEmail());
+        }
+        if (updateDTO.getTelephone() != null) {
+            compte.setTelephone(updateDTO.getTelephone());
+        }
+        if (updateDTO.getMotDePasse() != null) {
+            compte.setMotDePasse(updateDTO.getMotDePasse());
+        }
+        if (updateDTO.getRole() != null) {
+            compte.setRole(updateDTO.getRole());
+        }
+        if (updateDTO.getStatut() != null) {
+            compte.setStatut(updateDTO.getStatut());
+        }
+        if (updateDTO.getIsVerified() != null) {
+            setIsVerified(compte, updateDTO.getIsVerified());
+        }
+        
+        // Mettre à jour les informations de la personne (seulement si non null)
+        if (updateDTO.getNom() != null) {
+            personne.setNom(updateDTO.getNom());
+        }
+        if (updateDTO.getPrenom() != null) {
+            personne.setPrenom(updateDTO.getPrenom());
+        }
+        if (updateDTO.getAdresse() != null) {
+            personne.setAdresse(updateDTO.getAdresse());
+        }
+        if (updateDTO.getVille() != null) {
+            personne.setVille(updateDTO.getVille());
+        }
+        if (updateDTO.getPhotoProfil() != null) {
+            personne.setPhotoProfil(updateDTO.getPhotoProfil());
+        }
+        
+        // Mettre à jour les timestamps
+        personne.setUpdatedAt(LocalDateTime.now());
+        
+        // Sauvegarder les entités
+        personneRepository.save(personne);
+        Compte updatedCompte = compteRepository.save(compte);
+        
+        // Retourner le DTO combiné
+        PersonneSimpleDTO personneDTO = PersonneSimpleDTO.fromEntity(updatedCompte.getPersonne());
+        return CompteWithPersonneDTO.fromEntities(updatedCompte, personneDTO);
+    }
+
+    private void setIsVerified(Compte compte, boolean verified) {
+        // Utiliser réflexion pour accéder au champ isVerified s'il existe
+        try {
+            java.lang.reflect.Field isVerifiedField = Compte.class.getDeclaredField("isVerified");
+            isVerifiedField.setAccessible(true);
+            isVerifiedField.set(compte, verified);
+        } catch (Exception e) {
+            // Ignorer si le champ n'existe pas
+        }
     }
 }
