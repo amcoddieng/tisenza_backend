@@ -162,30 +162,33 @@ public class BoutiqueService {
         return boutiqueRepository.existsByVendeurId(vendeurId);
     }
 
-    public Boutique validateBoutique(Long id) {
+    public BoutiqueDTO validateBoutique(Long id) {
         return boutiqueRepository.findById(id)
                 .map(boutique -> {
                     boutique.setStatut(Boutique.Statut.VALIDE);
                     return boutiqueRepository.save(boutique);
                 })
+                .map(boutiqueMapper::toDTO)
                 .orElseThrow(() -> new RuntimeException("Boutique not found with id: " + id));
     }
 
-    public Boutique refuseBoutique(Long id) {
+    public BoutiqueDTO refuseBoutique(Long id) {
         return boutiqueRepository.findById(id)
                 .map(boutique -> {
                     boutique.setStatut(Boutique.Statut.REFUSE);
                     return boutiqueRepository.save(boutique);
                 })
+                .map(boutiqueMapper::toDTO)
                 .orElseThrow(() -> new RuntimeException("Boutique not found with id: " + id));
     }
 
-    public Boutique updateNote(Long id, Float note) {
+    public BoutiqueDTO updateNote(Long id, Float note) {
         return boutiqueRepository.findById(id)
                 .map(boutique -> {
                     boutique.setNote(note);
                     return boutiqueRepository.save(boutique);
                 })
+                .map(boutiqueMapper::toDTO)
                 .orElseThrow(() -> new RuntimeException("Boutique not found with id: " + id));
     }
 
@@ -221,15 +224,16 @@ public class BoutiqueService {
      * Met à jour le statut d'une boutique
      * @param id l'ID de la boutique
      * @param statut le nouveau statut
-     * @return la boutique mise à jour
+     * @return le DTO de la boutique mise à jour
      */
     @Transactional
-    public Boutique updateStatut(Long id, Boutique.Statut statut) {
+    public BoutiqueDTO updateStatut(Long id, Boutique.Statut statut) {
         return boutiqueRepository.findById(id)
                 .map(boutique -> {
                     boutique.setStatut(statut);
                     return boutiqueRepository.save(boutique);
                 })
+                .map(boutiqueMapper::toDTO)
                 .orElseThrow(() -> new RuntimeException("Boutique not found with id: " + id));
     }
 }

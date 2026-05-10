@@ -78,9 +78,11 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\converter\JsonStringConverter.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ArticleDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ArticleRequest.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ArticleResponseDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\CategorieDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\HistoriqueStockDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitDTO.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitResponseDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitWithArticlesDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\ProduitWithArticlesRequest.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\dto\SousCategorieDTO.java
@@ -91,6 +93,7 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\Produit.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\entity\SousCategorie.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\ArticleMapper.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\ArticleResponseMapper.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\CategorieMapper.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\mapper\ProduitMapper.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\produit\repository\ArticleRepository.java
@@ -107,6 +110,7 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\controller\PersonneController.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\CompteDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\ComptePersonneUpdateDTO.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\CompteResponseDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\CompteWithPersonneDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\PersonneDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\PersonneSimpleDTO.java
@@ -114,6 +118,7 @@ C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backe
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\dto\UserRegistrationDTO.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\entity\Compte.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\entity\Personne.java
+C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\mapper\CompteMapper.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\repository\CompteRepository.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\repository\PersonneRepository.java
 C:\Users\dieng\Desktop\tisenza_backend\src\main\java\com\tissenza\tissenza_backend\modules\user\service\CompteService.java

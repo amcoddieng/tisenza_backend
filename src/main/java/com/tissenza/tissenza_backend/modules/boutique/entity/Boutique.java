@@ -1,5 +1,6 @@
 package com.tissenza.tissenza_backend.modules.boutique.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tissenza.tissenza_backend.modules.user.entity.Compte;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class Boutique {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vendeur_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "createdBy", "updatedBy"})
     private Compte vendeur;
 
     @Column(name = "nom", length = 150)

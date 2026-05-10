@@ -235,11 +235,11 @@ public class BoutiqueController {
     
     @PutMapping("/{id}/note")
     @Operation(summary = "Mettre à jour la note", description = "Met à jour la note d'une boutique")
-    public ResponseEntity<ApiResponse<Boutique>> updateNote(
+    public ResponseEntity<ApiResponse<BoutiqueDTO>> updateNote(
             @Parameter(description = "ID de la boutique") @PathVariable Long id,
             @Parameter(description = "Nouvelle note") @RequestParam Float note) {
         try {
-            Boutique updatedBoutique = boutiqueService.updateNote(id, note);
+            BoutiqueDTO updatedBoutique = boutiqueService.updateNote(id, note);
             return ResponseEntity.ok(ApiResponse.success(updatedBoutique, "Note mise à jour avec succès"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -271,12 +271,12 @@ public class BoutiqueController {
      */
     @PutMapping("/{id}/statut")
     @Operation(summary = "Mettre à jour le statut", description = "Met à jour le statut d'une boutique")
-    public ResponseEntity<ApiResponse<Boutique>> updateStatut(
+    public ResponseEntity<ApiResponse<BoutiqueDTO>> updateStatut(
             @Parameter(description = "ID de la boutique") @PathVariable Long id,
             @Parameter(description = "Nouveau statut") @RequestParam String statut) {
         try {
             Boutique.Statut newStatut = Boutique.Statut.valueOf(statut.toUpperCase());
-            Boutique updatedBoutique = boutiqueService.updateStatut(id, newStatut);
+            BoutiqueDTO updatedBoutique = boutiqueService.updateStatut(id, newStatut);
             return ResponseEntity.ok(ApiResponse.success(updatedBoutique, "Statut mis à jour avec succès"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
