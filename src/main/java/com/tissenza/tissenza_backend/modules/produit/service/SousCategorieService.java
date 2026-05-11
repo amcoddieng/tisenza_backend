@@ -1,9 +1,13 @@
 package com.tissenza.tissenza_backend.modules.produit.service;
 
 import com.tissenza.tissenza_backend.modules.produit.dto.SousCategorieDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.SousCategorieCreateDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.SousCategorieUpdateDTO;
 import com.tissenza.tissenza_backend.modules.produit.entity.SousCategorie;
+import com.tissenza.tissenza_backend.modules.produit.entity.Categorie;
 import com.tissenza.tissenza_backend.modules.produit.mapper.CategorieMapper;
 import com.tissenza.tissenza_backend.modules.produit.repository.SousCategorieRepository;
+import com.tissenza.tissenza_backend.modules.produit.repository.CategorieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,9 +23,35 @@ public class SousCategorieService {
 
     private final SousCategorieRepository sousCategorieRepository;
     private final CategorieMapper categorieMapper;
+    private final CategorieRepository categorieRepository;
 
     public SousCategorie createSousCategorie(SousCategorie sousCategorie) {
         return sousCategorieRepository.save(sousCategorie);
+    }
+
+    @Transactional
+    public SousCategorieDTO createSousCategorieFromDTO(SousCategorieCreateDTO dto) {
+        try {
+            // Récupérer la catégorie
+            Categorie categorie = categorieRepository.findById(dto.getCategorieId())
+                    .orElseThrow(() -> new RuntimeException("Catégorie non trouvée avec l'ID: " + dto.getCategorieId()));
+
+            // Créer la sous-catégorie
+            SousCategorie sousCategorie = new SousCategorie();
+            sousCategorie.setNom(dto.getNom());
+            sousCategorie.setDescription(dto.getDescription());
+            sousCategorie.setCategorie(categorie);
+
+            // Sauvegarder
+            SousCategorie savedSousCategorie = sousCategorieRepository.save(sousCategorie);
+            
+            // Retourner le DTO
+            return categorieMapper.toSousCategorieDTO(savedSousCategorie);
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de la création de la sous-catégorie: {}", e.getMessage(), e);
+            throw new RuntimeException("Impossible de créer la sous-catégorie: " + e.getMessage());
+        }
     }
 
     public Optional<SousCategorie> getSousCategorieById(Long id) {
@@ -103,6 +133,40 @@ public class SousCategorieService {
                     return sousCategorieRepository.save(sousCategorie);
                 })
                 .orElseThrow(() -> new RuntimeException("SousCategorie not found with id: " + id));
+    }
+
+    @Transactional
+    public SousCategorieDTO updateSousCategorieFromDTO(Long id, SousCategorieUpdateDTO dto) {
+        try {
+            // Récupérer la sous-catégorie existante
+            SousCategorie existingSousCategorie = sousCategorieRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Sous-catégorie non trouvée avec l'ID: " + id));
+
+            // Mettre à jour les champs de base
+            if (dto.getNom() != null) {
+                existingSousCategorie.setNom(dto.getNom());
+            }
+            if (dto.getDescription() != null) {
+                existingSousCategorie.setDescription(dto.getDescription());
+            }
+
+            // Mettre à jour la catégorie si fournie
+            if (dto.getCategorieId() != null) {
+                Categorie categorie = categorieRepository.findById(dto.getCategorieId())
+                        .orElseThrow(() -> new RuntimeException("Catégorie non trouvée avec l'ID: " + dto.getCategorieId()));
+                existingSousCategorie.setCategorie(categorie);
+            }
+
+            // Sauvegarder la sous-catégorie mise à jour
+            SousCategorie updatedSousCategorie = sousCategorieRepository.save(existingSousCategorie);
+            
+            // Retourner le DTO
+            return categorieMapper.toSousCategorieDTO(updatedSousCategorie);
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de la mise à jour de la sous-catégorie: {}", e.getMessage(), e);
+            throw new RuntimeException("Impossible de mettre à jour la sous-catégorie: " + e.getMessage());
+        }
     }
 
     public void deleteSousCategorie(Long id) {

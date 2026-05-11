@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 @Component
 @RequiredArgsConstructor
@@ -154,14 +155,30 @@ public class DataInitializer implements CommandLineRunner {
             return;
         }
 
-        // Créer les catégories principales
+        // Créer les catégories principales une par une pour garantir les IDs
         List<Categorie> categories = createCategories();
-        List<Categorie> savedCategories = categorieRepository.saveAll(categories);
+        List<Categorie> savedCategories = new ArrayList<>();
+        
+        for (Categorie categorie : categories) {
+            Categorie savedCategorie = categorieRepository.save(categorie);
+            savedCategories.add(savedCategorie);
+            log.debug("Catégorie sauvegardée: ID={}, Nom={}", savedCategorie.getId(), savedCategorie.getNom());
+        }
+        
+        categorieRepository.flush(); // Forcer la synchronisation avec la base
         log.info("{} catégories créées", savedCategories.size());
-
+        
         // Créer les sous-catégories
         List<SousCategorie> subCategories = createSubCategories(savedCategories);
-        List<SousCategorie> savedSubCategories = sousCategorieRepository.saveAll(subCategories);
+        List<SousCategorie> savedSubCategories = new ArrayList<>();
+        
+        for (SousCategorie subCategorie : subCategories) {
+            SousCategorie savedSubCategorie = sousCategorieRepository.save(subCategorie);
+            savedSubCategories.add(savedSubCategorie);
+            log.debug("Sous-catégorie sauvegardée: ID={}, Nom={}, CategorieID={}", 
+                     savedSubCategorie.getId(), savedSubCategorie.getNom(), savedSubCategorie.getCategorie().getId());
+        }
+        
         log.info("{} sous-catégories créées", savedSubCategories.size());
 
         log.info("Initialisation des données terminée avec succès !");
@@ -590,9 +607,9 @@ public class DataInitializer implements CommandLineRunner {
             String[] couleurs = {"Blanc", "Noir", "Bleu", "Rouge", "Gris", "Vert", "Jaune", "Rose", "Bleu marine", "Beige"};
             String[] matieres = {"Coton", "Polyester", "Laine", "Lin", "Jean", "Soie", "Synthétique"};
             
-            String taille = taillesVetements[index % taillesVetements.length];
-            String couleur = couleurs[(index + taille.hashCode()) % couleurs.length];
-            String matiere = matieres[(index + couleur.hashCode()) % matieres.length];
+            String taille = taillesVetements[Math.abs(index) % taillesVetements.length];
+            String couleur = couleurs[Math.abs(index + taille.hashCode()) % couleurs.length];
+            String matiere = matieres[Math.abs(index + couleur.hashCode()) % matieres.length];
             
             return String.format("{\"taille\":\"%s\",\"couleur\":\"%s\",\"matiere\":\"%s\",\"origine\":\"Made in Senegal\"}", 
                                taille, couleur, matiere);
@@ -604,9 +621,9 @@ public class DataInitializer implements CommandLineRunner {
             String[] couleurs = {"Noir", "Blanc", "Bleu", "Rouge", "Gris", "Marron", "Vert"};
             String[] matieres = {"Cuir", "Synthétique", "Textile", "Caoutchouc", "Mesh"};
             
-            String pointure = pointures[index % pointures.length];
-            String couleur = couleurs[(index + pointure.hashCode()) % couleurs.length];
-            String matiere = matieres[(index + couleur.hashCode()) % matieres.length];
+            String pointure = pointures[Math.abs(index) % pointures.length];
+            String couleur = couleurs[Math.abs(index + pointure.hashCode()) % couleurs.length];
+            String matiere = matieres[Math.abs(index + couleur.hashCode()) % matieres.length];
             
             return String.format("{\"pointure\":\"%s\",\"couleur\":\"%s\",\"matiere\":\"%s\",\"type\":\"Sport/Casual\"}", 
                                pointure, couleur, matiere);
@@ -618,9 +635,9 @@ public class DataInitializer implements CommandLineRunner {
             String[] materiaux = {"Acier", "Or", "Argent", "Titane", "Cuir", "Plastique"};
             String[] couleurs = {"Argent", "Or", "Noir", "Bleu", "Rose", "Bronze"};
             
-            String style = styles[index % styles.length];
-            String materiau = materiaux[(index + style.hashCode()) % materiaux.length];
-            String couleur = couleurs[(index + materiau.hashCode()) % couleurs.length];
+            String style = styles[Math.abs(index) % styles.length];
+            String materiau = materiaux[Math.abs(index + style.hashCode()) % materiaux.length];
+            String couleur = couleurs[Math.abs(index + materiau.hashCode()) % couleurs.length];
             
             return String.format("{\"style\":\"%s\",\"materiau\":\"%s\",\"couleur\":\"%s\",\"etanche\":true}", 
                                style, materiau, couleur);
@@ -632,9 +649,9 @@ public class DataInitializer implements CommandLineRunner {
             String[] capacites = {"64GB", "128GB", "256GB", "512GB", "1TB"};
             String[] marques = {"Samsung", "Apple", "Xiaomi", "Huawei", "Oppo", "Nokia"};
             
-            String couleur = couleurs[index % couleurs.length];
-            String capacite = capacites[(index + couleur.hashCode()) % capacites.length];
-            String marque = marques[(index + capacite.hashCode()) % marques.length];
+            String couleur = couleurs[Math.abs(index) % couleurs.length];
+            String capacite = capacites[Math.abs(index + couleur.hashCode()) % capacites.length];
+            String marque = marques[Math.abs(index + capacite.hashCode()) % marques.length];
             
             return String.format("{\"couleur\":\"%s\",\"capacite\":\"%s\",\"marque\":\"%s\",\"garantie\":\"2 ans\"}", 
                                couleur, capacite, marque);
@@ -645,9 +662,9 @@ public class DataInitializer implements CommandLineRunner {
             String[] tailles = {"S", "M", "L", "XL", "Unique"};
             String[] marques = {"Premium", "Eco", "Pro", "Standard", "Deluxe"};
             
-            String couleur = couleurs[index % couleurs.length];
-            String taille = tailles[(index + couleur.hashCode()) % tailles.length];
-            String marque = marques[(index + taille.hashCode()) % marques.length];
+            String couleur = couleurs[Math.abs(index) % couleurs.length];
+            String taille = tailles[Math.abs(index + couleur.hashCode()) % tailles.length];
+            String marque = marques[Math.abs(index + taille.hashCode()) % marques.length];
             
             return String.format("{\"couleur\":\"%s\",\"taille\":\"%s\",\"marque\":\"%s\",\"qualité\":\"Haute\"}", 
                                couleur, taille, marque);

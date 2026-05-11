@@ -38,6 +38,25 @@ public class Article {
     @Column(name = "attributs", columnDefinition = "JSON")
     @JdbcTypeCode(SqlTypes.JSON)
     private String attributs;
+    
+    // Getter et Setter pour gérer la conversion JSON
+    public String getAttributs() {
+        return attributs;
+    }
+    
+    public void setAttributs(String attributs) {
+        this.attributs = attributs;
+    }
+    
+    // Méthode utilitaire pour définir les attributs depuis un objet
+    public void setAttributsFromObject(java.util.Map<String, Object> attributsMap) {
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            this.attributs = mapper.writeValueAsString(attributsMap);
+        } catch (Exception e) {
+            this.attributs = "{}";
+        }
+    }
 
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;

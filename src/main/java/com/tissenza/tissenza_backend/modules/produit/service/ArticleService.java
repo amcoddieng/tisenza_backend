@@ -1,11 +1,14 @@
 package com.tissenza.tissenza_backend.modules.produit.service;
 
 import com.tissenza.tissenza_backend.modules.produit.dto.ArticleDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ArticleCreateDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ArticleUpdateDTO;
 import com.tissenza.tissenza_backend.modules.produit.entity.Article;
 import com.tissenza.tissenza_backend.modules.produit.entity.HistoriqueStock;
 import com.tissenza.tissenza_backend.modules.produit.mapper.ArticleMapper;
 import com.tissenza.tissenza_backend.modules.produit.repository.ArticleRepository;
 import com.tissenza.tissenza_backend.modules.produit.repository.HistoriqueStockRepository;
+import com.tissenza.tissenza_backend.modules.produit.repository.ProduitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,9 +26,46 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final HistoriqueStockRepository historiqueStockRepository;
     private final ArticleMapper articleMapper;
+    private final ProduitRepository produitRepository;
 
     public Article createArticle(Article article) {
         return articleRepository.save(article);
+    }
+
+    @Transactional
+    public ArticleDTO createArticleFromDTO(ArticleCreateDTO articleDTO) {
+        try {
+            // Récupérer le produit
+            var produit = produitRepository.findById(articleDTO.getProduitId())
+                    .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + articleDTO.getProduitId()));
+
+            // Créer l'article
+            Article article = new Article();
+            article.setProduit(produit);
+            article.setSku(articleDTO.getSku());
+            article.setPrix(articleDTO.getPrix());
+            article.setStockActuel(articleDTO.getStockActuel());
+            article.setImage(articleDTO.getImage());
+
+            // Convertir les attributs Map<String, Object> en JSON String
+            if (articleDTO.getAttributs() != null) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                String attributsJson = mapper.writeValueAsString(articleDTO.getAttributs());
+                article.setAttributs(attributsJson);
+            } else {
+                article.setAttributs("{}");
+            }
+
+            // Sauvegarder l'article
+            Article savedArticle = articleRepository.save(article);
+            
+            // Retourner le DTO
+            return articleMapper.toDTO(savedArticle);
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de la création de l'article: {}", e.getMessage(), e);
+            throw new RuntimeException("Impossible de créer l'article: " + e.getMessage());
+        }
     }
 
     public Optional<Article> getArticleById(Long id) {
@@ -48,6 +88,46 @@ public class ArticleService {
                     return articleRepository.save(article);
                 })
                 .orElseThrow(() -> new RuntimeException("Article not found with id: " + id));
+    }
+
+    @Transactional
+    public ArticleDTO updateArticleFromDTO(Long id, ArticleUpdateDTO articleDTO) {
+        try {
+            // Récupérer l'article existant
+            Article existingArticle = articleRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Article non trouvé avec l'ID: " + id));
+
+            // Mettre à jour les champs de base
+            if (articleDTO.getSku() != null) {
+                existingArticle.setSku(articleDTO.getSku());
+            }
+            if (articleDTO.getPrix() != null) {
+                existingArticle.setPrix(articleDTO.getPrix());
+            }
+            if (articleDTO.getStockActuel() != null) {
+                existingArticle.setStockActuel(articleDTO.getStockActuel());
+            }
+            if (articleDTO.getImage() != null) {
+                existingArticle.setImage(articleDTO.getImage());
+            }
+
+            // Convertir les attributs Map<String, Object> en JSON String
+            if (articleDTO.getAttributs() != null) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                String attributsJson = mapper.writeValueAsString(articleDTO.getAttributs());
+                existingArticle.setAttributs(attributsJson);
+            }
+
+            // Sauvegarder l'article mis à jour
+            Article updatedArticle = articleRepository.save(existingArticle);
+            
+            // Retourner le DTO
+            return articleMapper.toDTO(updatedArticle);
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de la mise à jour de l'article: {}", e.getMessage(), e);
+            throw new RuntimeException("Impossible de mettre à jour l'article: " + e.getMessage());
+        }
     }
 
     public void deleteArticle(Long id) {

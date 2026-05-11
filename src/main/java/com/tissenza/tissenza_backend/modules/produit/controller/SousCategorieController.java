@@ -1,6 +1,8 @@
 package com.tissenza.tissenza_backend.modules.produit.controller;
 
 import com.tissenza.tissenza_backend.modules.produit.dto.SousCategorieDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.SousCategorieCreateDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.SousCategorieUpdateDTO;
 import com.tissenza.tissenza_backend.modules.produit.entity.SousCategorie;
 import com.tissenza.tissenza_backend.modules.produit.service.SousCategorieService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,9 +27,13 @@ public class SousCategorieController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Créer une nouvelle sous-catégorie", description = "Crée une nouvelle sous-catégorie dans le système")
-    public ResponseEntity<SousCategorie> createSousCategorie(@RequestBody SousCategorie sousCategorie) {
-        SousCategorie createdSousCategorie = sousCategorieService.createSousCategorie(sousCategorie);
-        return new ResponseEntity<>(createdSousCategorie, HttpStatus.CREATED);
+    public ResponseEntity<SousCategorieDTO> createSousCategorie(@RequestBody SousCategorieCreateDTO sousCategorieDTO) {
+        try {
+            SousCategorieDTO createdSousCategorie = sousCategorieService.createSousCategorieFromDTO(sousCategorieDTO);
+            return new ResponseEntity<>(createdSousCategorie, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
     }
 
     @GetMapping("/{id}")
@@ -51,14 +57,14 @@ public class SousCategorieController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Mettre à jour une sous-catégorie", description = "Met à jour les informations d'une sous-catégorie existante")
-    public ResponseEntity<SousCategorie> updateSousCategorie(
+    public ResponseEntity<SousCategorieDTO> updateSousCategorie(
             @Parameter(description = "ID de la sous-catégorie à mettre à jour") @PathVariable Long id,
-            @RequestBody SousCategorie sousCategorieDetails) {
+            @RequestBody SousCategorieUpdateDTO sousCategorieDTO) {
         try {
-            SousCategorie updatedSousCategorie = sousCategorieService.updateSousCategorie(id, sousCategorieDetails);
+            SousCategorieDTO updatedSousCategorie = sousCategorieService.updateSousCategorieFromDTO(id, sousCategorieDTO);
             return ResponseEntity.ok(updatedSousCategorie);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
     }
 

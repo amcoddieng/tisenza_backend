@@ -1,6 +1,8 @@
 package com.tissenza.tissenza_backend.modules.produit.controller;
 
 import com.tissenza.tissenza_backend.modules.produit.dto.ArticleDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ArticleCreateDTO;
+import com.tissenza.tissenza_backend.modules.produit.dto.ArticleUpdateDTO;
 import com.tissenza.tissenza_backend.modules.produit.entity.Article;
 import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
 import com.tissenza.tissenza_backend.modules.produit.service.ArticleService;
@@ -33,8 +35,8 @@ public class ArticleController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'VENDEUR')")
     @Operation(summary = "Créer un nouvel article", description = "Crée un nouvel article dans le système")
-    public ResponseEntity<ArticleDTO> createArticle(@RequestBody Article article) {
-        ArticleDTO createdArticle = articleService.createArticleDTO(article);
+    public ResponseEntity<ArticleDTO> createArticle(@RequestBody ArticleCreateDTO articleDTO) {
+        ArticleDTO createdArticle = articleService.createArticleFromDTO(articleDTO);
         return new ResponseEntity<>(createdArticle, HttpStatus.CREATED);
     }
 
@@ -108,9 +110,9 @@ public class ArticleController {
     @Operation(summary = "Mettre à jour un article", description = "Met à jour les informations d'un article existant")
     public ResponseEntity<ArticleDTO> updateArticle(
             @Parameter(description = "ID de l'article à mettre à jour") @PathVariable Long id,
-            @RequestBody Article articleDetails) {
+            @RequestBody ArticleUpdateDTO articleDetails) {
         try {
-            ArticleDTO updatedArticle = articleService.updateArticleDTO(id, articleDetails);
+            ArticleDTO updatedArticle = articleService.updateArticleFromDTO(id, articleDetails);
             return ResponseEntity.ok(updatedArticle);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
