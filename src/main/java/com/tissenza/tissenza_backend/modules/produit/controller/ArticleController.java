@@ -7,6 +7,8 @@ import com.tissenza.tissenza_backend.modules.produit.entity.Article;
 import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
 import com.tissenza.tissenza_backend.modules.produit.service.ArticleService;
 import com.tissenza.tissenza_backend.service.FileStorageService;
+import com.tissenza.tissenza_backend.service.LocalStorageService;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +33,7 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final FileStorageService fileStorageService;
+    private final LocalStorageService localStorageService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'VENDEUR')")
