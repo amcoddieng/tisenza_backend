@@ -6,7 +6,7 @@ import com.tissenza.tissenza_backend.modules.produit.dto.ArticleUpdateDTO;
 import com.tissenza.tissenza_backend.modules.produit.entity.Article;
 import com.tissenza.tissenza_backend.modules.produit.entity.Produit;
 import com.tissenza.tissenza_backend.modules.produit.service.ArticleService;
-import com.tissenza.tissenza_backend.service.CloudinaryService;
+import com.tissenza.tissenza_backend.service.FileStorageService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +30,7 @@ import java.util.List;
 public class ArticleController {
 
     private final ArticleService articleService;
-    private final CloudinaryService cloudinaryService;
+    private final FileStorageService fileStorageService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'VENDEUR')")
@@ -44,7 +44,7 @@ public class ArticleController {
      * Créer un article avec upload d'image
      */
     @PostMapping("/with-image")
-    @Operation(summary = "Créer un article avec image", description = "Crée un nouvel article avec upload d'image sur Cloudinary")
+    @Operation(summary = "Créer un article avec image", description = "Crée un nouvel article avec upload d'image locale")
     public ResponseEntity<ArticleDTO> createArticleWithImage(
             @RequestParam("produitId") Long produitId,
             @RequestParam("sku") String sku,
@@ -52,13 +52,13 @@ public class ArticleController {
             @RequestParam(value = "stockActuel", required = false, defaultValue = "0") Integer stockActuel,
             @RequestParam(value = "attributs", required = false) String attributs,
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
-        
+
         try {
-            // Upload l'image si fournie
-            String imageUrl = null;
+            // Sauvegarde l'image si fournie
+            String imagePath = null;
             if (imageFile != null && !imageFile.isEmpty()) {
-                imageUrl = cloudinaryService.uploadImage(imageFile);
-                log.info("Image uploadée: {}", imageUrl);
+                imagePath = fileStorageService.saveArticleImage(imageFile);
+                log.info("Image sauvegardée: {}", imagePath);
             }
             
             // Créer l'article avec l'URL de l'image
@@ -73,13 +73,13 @@ public class ArticleController {
             article.setPrix(prix);
             article.setStockActuel(stockActuel);
             article.setAttributs(attributs);
-            article.setImage(imageUrl);
+            article.setImage(imagePath);
             
             ArticleDTO createdArticle = articleService.createArticleDTO(article);
             return new ResponseEntity<>(createdArticle, HttpStatus.CREATED);
-            
+
         } catch (IOException e) {
-            log.error("Erreur lors de l'upload de l'image: {}", e.getMessage());
+            log.error("Erreur lors de la sauvegarde de l'image: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (Exception e) {
             log.error("Erreur lors de la création de l'article: {}", e.getMessage());
@@ -123,25 +123,25 @@ public class ArticleController {
      * Mettre à jour l'image d'un article
      */
     @PostMapping("/{id}/image")
-    @Operation(summary = "Mettre à jour l'image", description = "Upload et met à jour l'image d'un article existant")
+    @Operation(summary = "Mettre à jour l'image", description = "Sauvegarde et met à jour l'image d'un article existant")
     public ResponseEntity<ArticleDTO> updateImage(
             @Parameter(description = "ID de l'article") @PathVariable Long id,
             @RequestParam("image") MultipartFile imageFile) {
-        
+
         try {
-            // Upload l'image sur Cloudinary
-            String imageUrl = cloudinaryService.uploadImage(imageFile);
-            log.info("Image uploadée: {}", imageUrl);
-            
-            // Mettre à jour l'article avec la nouvelle URL
+            // Sauvegarde l'image localement
+            String imagePath = fileStorageService.saveArticleImage(imageFile);
+            log.info("Image sauvegardée: {}", imagePath);
+
+            // Mettre à jour l'article avec le nouveau chemin
             Article articleDetails = new Article();
-            articleDetails.setImage(imageUrl);
-            
+            articleDetails.setImage(imagePath);
+
             ArticleDTO updatedArticle = articleService.updateArticleDTO(id, articleDetails);
             return ResponseEntity.ok(updatedArticle);
-            
+
         } catch (IOException e) {
-            log.error("Erreur lors de l'upload de l'image: {}", e.getMessage());
+            log.error("Erreur lors de la sauvegarde de l'image: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (Exception e) {
             log.error("Erreur lors de la mise à jour de l'image: {}", e.getMessage());
