@@ -178,7 +178,7 @@ public class PanierService {
      * Vider le panier
      */
     @Transactional
-    public void viderPanier(Long panierId) {
+    public PanierDTO viderPanier(Long panierId) {
         Panier panier = panierRepository.findById(panierId)
                 .orElseThrow(() -> new RuntimeException("Panier non trouvé avec l'ID: " + panierId));
 
@@ -187,6 +187,7 @@ public class PanierService {
         panierRepository.save(panier);
         
         log.info("Panier vidé: {}", panierId);
+        return panierMapper.toDTO(panier);
     }
 
     /**
@@ -221,6 +222,32 @@ public class PanierService {
     public List<PanierDTO> getPaniersByClient(Long clientId) {
         List<Panier> paniers = panierRepository.findByClientId(clientId);
         return panierMapper.toDTOList(paniers);
+    }
+
+    /**
+     * Récupérer tous les paniers
+     */
+    @Transactional(readOnly = true)
+    public List<PanierDTO> getAllPaniers() {
+        List<Panier> paniers = panierRepository.findAll();
+        return panierMapper.toDTOList(paniers);
+    }
+
+    /**
+     * Supprimer un panier complet
+     */
+    @Transactional
+    public void supprimerPanier(Long panierId) {
+        Panier panier = panierRepository.findById(panierId)
+                .orElseThrow(() -> new RuntimeException("Panier non trouvé avec l'ID: " + panierId));
+
+        // Supprimer tous les items du panier
+        panierItemRepository.deleteByPanierId(panierId);
+        
+        // Supprimer le panier
+        panierRepository.delete(panier);
+        
+        log.info("Panier supprimé: {}", panierId);
     }
 
     /**

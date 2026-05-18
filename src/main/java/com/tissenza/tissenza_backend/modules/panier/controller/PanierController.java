@@ -101,13 +101,13 @@ public class PanierController {
      * Vider le panier
      */
     @DeleteMapping("/{panierId}/vider")
-    @Operation(summary = "Vider le panier", description = "Supprime tous les articles du panier")
-    public ResponseEntity<Void> viderPanier(
+    @Operation(summary = "Vider le panier", description = "Supprime tous les articles du panier et met le total à 0")
+    public ResponseEntity<PanierDTO> viderPanier(
             @Parameter(description = "ID du panier") @PathVariable Long panierId) {
-        
+
         try {
-            panierService.viderPanier(panierId);
-            return ResponseEntity.ok().build();
+            PanierDTO panier = panierService.viderPanier(panierId);
+            return ResponseEntity.ok(panier);
         } catch (Exception e) {
             log.error("Erreur lors du vidage du panier {}: {}", panierId, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -162,6 +162,39 @@ public class PanierController {
         } catch (Exception e) {
             log.error("Erreur lors de la récupération des paniers pour le client {}: {}", clientId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Récupérer tous les paniers
+     */
+    @GetMapping
+    @Operation(summary = "Récupérer tous les paniers", description = "Récupère la liste de tous les paniers du système")
+    public ResponseEntity<List<PanierDTO>> getAllPaniers() {
+
+        try {
+            List<PanierDTO> paniers = panierService.getAllPaniers();
+            return ResponseEntity.ok(paniers);
+        } catch (Exception e) {
+            log.error("Erreur lors de la récupération de tous les paniers: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Supprimer un panier complet
+     */
+    @DeleteMapping("/{panierId}")
+    @Operation(summary = "Supprimer un panier", description = "Supprime le panier et tous ses articles")
+    public ResponseEntity<Void> supprimerPanier(
+            @Parameter(description = "ID du panier") @PathVariable Long panierId) {
+
+        try {
+            panierService.supprimerPanier(panierId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            log.error("Erreur lors de la suppression du panier {}: {}", panierId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 }

@@ -2280,6 +2280,42 @@ GET /api/paniers/{panierId}
 GET /api/paniers/client/{clientId}
 ```
 
+#### Récupérer tous les paniers
+```http
+GET /api/paniers
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "clientId": 1,
+    "clientNom": "Doe John",
+    "status": "EN_ATTENTE",
+    "total": 149.97,
+    "dateCreation": "2026-05-01T10:00:00",
+    "items": [
+      {
+        "id": 1,
+        "articleId": 1,
+        "quantite": 2,
+        "prixUnitaire": 29.99
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "clientId": 2,
+    "clientNom": "Smith Jane",
+    "status": "VALIDE",
+    "total": 89.99,
+    "dateCreation": "2026-05-01T11:00:00",
+    "items": []
+  }
+]
+```
+
 ---
 
 ## **APIs de Commande**
